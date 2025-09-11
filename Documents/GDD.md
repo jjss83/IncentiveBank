@@ -1,9 +1,3 @@
-ve this concept—turn reading time into real-world perks, wrap it in a playful loop, keep everything local, and make the “AI” invisible but helpful. Below is a **copy-pasteable prompt** you can use to generate an informed, production-ready GDD in ChatGPT/Agent Mode. After that, I’ve included a **targeted questionnaire**; answer it inline and I’ll turn your answers into the first GDD draft in this same chat.
-
----
-
-# Copy-paste this into ChatGPT to generate the GDD
-
 **Role & Output Style**
 
 You are a **Senior Game Designer & Unity Technical Lead**. Produce a **complete Game Design Document (GDD)** for a small, offline, privacy-first reading-incentive game built with Unity. Write concise, implementation-aware design, not marketing fluff. Use clear headings, simple language, and tables where helpful. Assume **local-only MVP**, **no user management**, bilingual **Spanish/English** support.
@@ -13,10 +7,10 @@ A kid reads aloud (or practices early reading sounds) for short sessions. The ap
 
 **Non-Negotiable Constraints (fixed)**
 
-* Engine: **Unity (LTS)**, platform(s) \[TO FILL].
+* Engine: **Unity (LTS)**, UI Toolkit. Platforms: Android phones & tablets (min Android 8.0, target 10+), iOS iPhone & iPad (iOS 15+), Windows PC (Win10+ with built‑in or external mic). (All confirmed for MVP)
 * Offline/by-design: **no servers, no analytics**, local storage only.
 * **No user accounts** for MVP.
-* **Primary input**: reading time captured via **on-device audio** (human-voice presence).
+* **Primary input**: reading time captured via **on-device audio** (human-voice presence) and touch.
 * **Optional input**: text-following (finger or caret) if reading happens on-screen.
 * **Languages**: Spanish and English UI + content support.
 * **Configurable incentives** (what/how/when), but **grant logic is deterministic and visible** to the parent.
@@ -73,16 +67,16 @@ A kid reads aloud (or practices early reading sounds) for short sessions. The ap
 
 **Known Inputs (fill from the questionnaire below; where missing, make sensible defaults and mark with “Assumed”)**
 
-* Platforms & devices: \[PLATFORMS]
-* Unity version: \[UNITY\_LTS]
-* Reading context: \[ON-SCREEN / PHYSICAL / BOTH]
-* Session goal default: \[e.g., 5 minutes]
-* Incentive types allowed: \[e.g., screen time, allowance, toy points]
-* Bilingual scope: \[Full UI + content metadata in ES/EN]
+* Platforms & devices: \Android phones & tablets (min Android 8.0, target 10+), iOS iPhone & iPad (iOS 15+), Windows PC (Win10+ with built‑in or external mic). (All confirmed for MVP
+* Unity version: latest beta versions
+* Reading context: ON SCREEN ONLY
+* Session goal default:configurable
+* Incentive types allowed: screen time, allowance, toy points
+* Bilingual scope: \[Full UI + content metadata in EN]
 * Offline ASR scope: \[VAD only for MVP; optional phoneme hints if on-device feasible]
-* Content source: \[bundled passages / parent-imported PDFs / just “time only” MVP]
-* Data retention: \[local only; reset/backup behavior]
-* Safety/abuse policy: \[light heuristics OK; no biometric storage]
+* Content source: Fixed text sources to test formats can be fixed for the MVP
+* Data retention: local only, do persist the points or tokens in between session, no back up necesary though
+* Safety/abuse policy: [light heuristics OK; no biometric storage]
 
 **Output Format**
 
@@ -94,26 +88,27 @@ A kid reads aloud (or practices early reading sounds) for short sessions. The ap
 
 ## Questionnaire (answer inline; I’ll turn it into the GDD)
 
-1. **Platforms**: Which devices for MVP? (e.g., Android tablet/phone, iPad, Windows laptop with mic)
-2. **Unity version**: Which LTS do you prefer? If unsure, say “latest LTS.”
-3. **Reading context**: Are kids reading **on-screen** (text displayed in-app), **from physical books** (app listens), or **both**?
-4. **Text-following**: If on-screen, should the kid drag a finger/caret to track progress? If physical book, do you want camera-based finger tracking (more complex) in MVP, or skip for now?
-5. **Session goal**: Default read time per reward (5 minutes?), and daily cap? (e.g., max 30 minutes/day rewarded)
-6. **Incentives**: Which real-world incentives do you want to model first? (screen time minutes, tokens toward a toy, allowance credits, sticker chart)
-7. **Economy rules**: How many in-game tokens/min per reading minute? Any streak bonus? Any cooldowns between sessions?
-8. **Parent controls**: PIN lock needed? Manual override to grant/deny rewards? Export a simple local report (CSV/JSON)?
-9. **Languages**: UI in ES/EN for MVP? Any initial content in both languages?
-10. **Content source**: For MVP, should we ship **a tiny built-in library** (short ES/EN passages), **allow parent to paste/import text**, or **track time only** (no text)?
-11. **Validation strictness**: For early readers, is **“human voice present”** sufficient? For older kids, do you want optional stricter validation (e.g., require touch-drag over text for part of the session)?
-12. **Noise environments**: Any typical contexts we should design for? (car rides, living room with TV, classroom)
-13. **Privacy stance**: Confirm **no cloud**, **no third-party analytics**, **no recordings saved** (only lightweight session stats). Is that correct?
-14. **Accessibility defaults**: Enable dyslexia-friendly font/spacing toggle by default? Larger base font?
-15. **Devices constraints**: Low-end Android target RAM/CPU expectations? Any must-support devices you own?
-16. **Art/Theme**: What vibe do you want? (cozy reading nook, playful library critters, minimalist “focus” mode)
-17. **Reward reveal**: How should the reward be presented? (confetti + stamp book, ticket machine animation, simple modal)
-18. **Parent setup time**: Should first-run setup be <2 minutes with presets? What presets? (Age band, 5-min goal, token mapping)
-19. **Data model**: Do you want a simple local JSON file with human-readable logs?
-20. **Future (post-MVP)**: List 3 features you might want soon (e.g., phoneme-level feedback, gentle mispronunciation hints, book-level progress, achievements).
+1. **Platforms**: Which devices for MVP? Android tablet/phone, iPad, Windows laptop with mic
+2. **Unity version**: Which LTS do you prefer? Latest beta
+3. **Reading context**: Are kids reading **on-screen** (text displayed in-app), **from physical books** (app listens), or **both**? just from the screen
+4. **Text-following**: If on-screen, should the kid drag a finger/caret to track progress? yes, this could be an option, but it has to verify the child is trying to read (hear human sounds), if its recognizable, then the tracking is automatic
+5. **Session goal**: Default read time per reward (5 minutes?), and daily cap? (e.g., max 30 minutes/day rewarded) this all should be configurable, for now, we can use fixed json files with the configuration settings for the MVP
+6. **Incentives**: Which real-world incentives do you want to model first? for the MVP tokens that can be exchange for: screen time, allowance, stickers. All configure through fixed json files for the MVP
+7. **Economy rules**: How many in-game tokens/min per reading minute? Any streak bonus? Any cooldowns between sessions? not for the MVP, lets keep it simple
+8. **Parent controls**: PIN lock needed? Manual override to grant/deny rewards? Export a simple local report (CSV/JSON)? not for the MVP
+9. **Languages**: UI in ES/EN for MVP? Any initial content in both languages? lets make it a requirement to be able to read from a content folder, for the MVP this content folder will be fixed. The format of the content I don't know and should be an open question to investigate more. Support ES/EN
+10. **Content source**: For MVP, should we ship **a tiny built-in library** (short ES/EN passages), **allow parent to paste/import text**, or **track time only** (no text)? lets make it a requirement to be able to read from a content folder, for the MVP this content folder will be fixed. The format of the content I don't know and should be an open question to investigate more.
+11. **Validation strictness**: For early readers, is **“human voice present”** sufficient? yes
+    For older kids, do you want optional stricter validation? Yes, then each word will auto marked as read and only advance as the child reads
+12. **Noise environments**: Any typical contexts we should design for? (car rides, living room with TV, classroom) not for the MVP, but if there are ways to get these noise dealing features, let's leverage them
+13. **Privacy stance**: Confirm **no cloud**, **no third-party analytics**, **no recordings saved** (only lightweight session stats). Is that correct? yes
+14. **Accessibility defaults**: Enable dyslexia-friendly font/spacing toggle by default? Larger base font? no
+15. **Devices constraints**: Low-end Android target RAM/CPU expectations? Any must-support devices you own? no
+16. **Art/Theme**: What vibe do you want? (cozy reading nook, playful library critters, minimalist “focus” mode) kid oriented, simple clean but child friendly
+17. **Reward reveal**: How should the reward be presented? (confetti + stamp book, ticket machine animation, simple modal) for now just the token count
+18. **Parent setup time**: Should first-run setup be <2 minutes with presets? What presets? (Age band, 5-min goal, token mapping) pressets can be a json file fixed for now
+19. **Data model**: Do you want a simple local JSON file with human-readable logs? yes
+20. **Future (post-MVP)**: List 3 features you might want soon (e.g., phoneme-level feedback, gentle mispronunciation hints, book-level progress, achievements). achivements
 
 ---
 
