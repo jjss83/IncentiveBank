@@ -1,0 +1,141 @@
+# =====================
+# Unity .gitignore
+# Reference: https://github.com/github/gitignore/blob/main/Unity.gitignore
+# Tailored for this project: keep Assets/, Packages/, ProjectSettings/, and necessary docs.
+# =====================
+
+############################
+# Core Unity Generated Data
+############################
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+UserSettings/
+
+# Crash & error logs
+*.stacktrace
+
+# Build artifacts (platform-specific)
+*.apk
+*.aab
+*.xcodeproj/
+*.xcworkspace/
+*.xcuserstate
+*.app
+*.ipa
+*.exe
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+*.unitypackage
+
+# Burst
+[Bb]urstDebugInformation*/
+
+# Unity Addressables
+[Aa]sset[Bb]undles*/
+# (Addressables build path defaults)
+*/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+*/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.hash
+*/[Aa]ddressable[Aa]ssets[Dd]ata/*/catalog.json
+*/[Aa]ddressable[Aa]ssets[Dd]ata/*/link.xml
+*/[Aa]ddressable[Aa]ssets[Dd]ata/*/addressables_content_state.bin
+
+# Shader cache
+[Ss]hader[Cc]ache/
+*.shadergraph.meta
+
+# Lightmap / GI cache (auto-regenerated)
+**/LightingData.asset
+**/Lightmap-*_comp
+aura-light-cache*/
+
+# Streaming / Generated
+[Ss]treamingAssets/aa/*/*.bundle
+
+# Cache & Temp
+*.pidb
+*.suo
+*.user
+*.userprefs
+*.csproj
+*.unityproj
+*.tmp
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pid
+*.booproj
+*.orig
+*.idb
+*.DS_Store
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Visual Studio
+.vs/
+*.DotSettings.user
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Logs & profiling
+*.etl
+*.ncb
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.utmp
+
+# Collab / Plastic / Source Control metadata
+.glbtemp/
+# PlasticSCM (if used)
+**/.plastic/
+**/plastic.workspace
+
+# Unity Cache Server data (if local path accidentally inside repo)
+[Cc]acheServer/
+
+# Analytics / Crash dumps
+*.dmp
+
+# Packages auto-generated
+Packages/packages-lock.json
+# (If you want deterministic package resolution, comment the line above.)
+
+# Addressables Player build cache
+ServerData/
+
+# Generated localization tables
+Locales/**/StringTableCollection/*.json
+
+# Do not ignore these (documentation & design)
+!Documents/
+!Documents/**
+
+############################
+# Optional: keep build scripts but ignore outputs
+############################
+[Bb]uild/**
+!Build/README.md
+
+############################
+# Custom project specific ignores
+############################
+# Add any project-specific patterns below this line
+# e.g. Tools/LocalOnly/
+
