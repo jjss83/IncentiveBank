@@ -13,6 +13,7 @@ Out of Scope (Now): Strict mode phoneme-level ASR, advanced analytics, polish an
 WIP Policy: Max 1 active Code task per dev; Design tasks fast-tracked; Testing tasks paired
 
 ## Epics
+
 ### EP-01 Core Reading & Timing
 Narrative: Child can open a passage and system counts valid reading time using voice detection until goal reached
 Business Value: Delivers fundamental loop proving engagement and timing accuracy
@@ -34,36 +35,41 @@ Business Value: Provides pathway for higher rigor sessions and future differenti
 Status: Queued
 
 ## User Stories
-#### US-001 (Epic: EP-01)
+
+### US-001 (Epic: EP-01)
 As a child, I want reading time to count only while I'm actually speaking so that rewards feel fair
 Acceptance Criteria:
+
 - Time counted only when voice present matches VAD thresholds
 - Timer pauses during silence automatically
 - Session ends manually or on goal completion
 - Edge noise (TV/music) minimally inflates counted seconds
 Status: Ready
 
-#### US-002 (Epic: EP-02)
+### US-002 (Epic: EP-02)
 As a child, I want to see a token reward pop when I meet my goal so that I feel progress and motivation
 Acceptance Criteria:
+
 - Token reward triggers exactly once per goal session
 - Token total increments immediately after reward
 - Pop animation completes within 400ms
 - Reward logged to persistent store
 Status: Ready
 
-#### US-003 (Epic: EP-03)
+### US-003 (Epic: EP-03)
 As a parent/child, I want to switch between EN and ES passages so that both languages are supported at home
 Acceptance Criteria:
+
 - EN and ES passage lists load from JSON manifest
 - Selecting locale filters list without restart
 - Missing locale file fails gracefully (no crash)
 - UI strings change with locale selection
 Status: Ready
 
-#### US-004 (Epic: EP-04)
+### US-004 (Epic: EP-04)
 As a parent, I want strict mode to require both speaking and caret advancement so that attention remains focused
 Acceptance Criteria:
+
 - Strict mode counts time only with voice + periodic caret movement
 - Relaxed mode unaffected by caret inactivity
 - Cadence rule modifiable via settings.json
@@ -71,11 +77,13 @@ Acceptance Criteria:
 Status: Queued
 
 ## Tasks
+
 ### TK-0001 US-001 design doc (Story: US-001, Type: Design, Est: S)
 Outcome: Lightweight design describing VAD pipeline, timer state machine, update loop responsibilities
 GDD Trace: GDDv1.1.md#vad-voice-activity-detection
 Dependencies: None
 Acceptance Criteria:
+
 - File `Documents/design/US-001-design.md` created
 - Sections: Purpose, Components, Data Flow, State Machine, Risks, Decisions
 - At least 2 risks + 1 open question captured
@@ -85,6 +93,7 @@ Outcome: `VADService` converts PCM frames to voice active/inactive events with h
 GDD Trace: GDDv1.1.md#vad-voice-activity-detection
 Dependencies: TK-0001
 Acceptance Criteria:
+
 - File `Assets/Scripts/Audio/VADService.cs` created
 - Public event `OnVoiceActive(bool active)` fires on state changes only
 - Hysteresis thresholds configurable via serialized fields
@@ -96,6 +105,7 @@ Outcome: `ReadingSessionTimer` tracks counted seconds only while voice active
 GDD Trace: GDDv1.1.md#core-loops-compact
 Dependencies: TK-0001
 Acceptance Criteria:
+
 - File `Assets/Scripts/Session/ReadingSessionTimer.cs` created
 - Method `Update(float dt)` only adds dt when active flag true
 - Drift <0.1s over simulated 5 minutes test
@@ -107,6 +117,7 @@ Outcome: `SessionController` orchestrates mic start, VAD subscription, timer upd
 GDD Trace: GDDv1.1.md#core-loops-compact
 Dependencies: TK-0002, TK-0003
 Acceptance Criteria:
+
 - File `Assets/Scripts/Session/SessionController.cs` created
 - Public `StartSession(passageId)` initializes timer and VAD
 - Triggers event `OnGoalReached` exactly once
@@ -118,6 +129,7 @@ Outcome: Optional spectral flatness gating reduces music/TV false positives
 GDD Trace: GDDv1.1.md#vad-voice-activity-detection
 Dependencies: TK-0002
 Acceptance Criteria:
+
 - Feature flag exposed in `settings.json` (`useSpectralFlatness`)
 - Flatness calculation window adjustable (config)
 - Adds <2% CPU on mid-tier device (profiling note placeholder)
@@ -129,6 +141,7 @@ Outcome: Design clarifying reward trigger timing and animation handshake
 GDD Trace: GDDv1.1.md#rewards
 Dependencies: None
 Acceptance Criteria:
+
 - File `Documents/design/US-002-design.md` created
 - Defines trigger event source and UI update order
 - Identifies potential double-award race and mitigation
@@ -138,6 +151,7 @@ Outcome: `TokenManager` loads/saves totals and provides atomic award method
 GDD Trace: GDDv1.1.md#rewards
 Dependencies: TK-0006
 Acceptance Criteria:
+
 - File `Assets/Scripts/Rewards/TokenManager.cs` created
 - Method `Award(int amount)` atomic and idempotent per session goal
 - Reads initial total from `logs.json`
@@ -149,6 +163,7 @@ Outcome: Prefab `TokenPop.prefab` with scale+ease animation 200–400ms
 GDD Trace: GDDv1.1.md#rewards
 Dependencies: TK-0006
 Acceptance Criteria:
+
 - File `Assets/Prefabs/TokenPop.prefab` exists
 - Animation duration within 0.2–0.4s window
 - No console errors on instantiation
@@ -160,6 +175,7 @@ Outcome: Session goal reach triggers token award then animation without race con
 GDD Trace: GDDv1.1.md#rewards
 Dependencies: TK-0004, TK-0007, TK-0008
 Acceptance Criteria:
+
 - Single animation instance per goal reached
 - Token total UI reflects new value before animation end
 - Award skipped if already granted this session
@@ -171,6 +187,7 @@ Outcome: Design for content and localization loading pipeline
 GDD Trace: GDDv1.1.md#content--localization-final
 Dependencies: None
 Acceptance Criteria:
+
 - File `Documents/design/US-003-design.md` created
 - Describes manifest parsing and locale switching strategy
 - Notes fallback behavior on missing locale file
@@ -180,6 +197,7 @@ Outcome: `ManifestLoader` loads JSON manifest into in-memory model
 GDD Trace: GDDv1.1.md#content--localization-final
 Dependencies: TK-0010
 Acceptance Criteria:
+
 - File `Assets/Scripts/Content/ManifestLoader.cs` created
 - Public method `Load()` returns structured model (locales, groups, files)
 - Graceful handling of missing file returns empty model
@@ -191,6 +209,7 @@ Outcome: Locale switching reloads UI text assets
 GDD Trace: GDDv1.1.md#content--localization-final
 Dependencies: TK-0010
 Acceptance Criteria:
+
 - File `Assets/Scripts/Localization/LocaleSwitcher.cs` created
 - Method `SetLocale(code)` reloads UI strings and raises event
 - Falls back to `en` if requested locale missing
@@ -202,6 +221,7 @@ Outcome: UI passage list refreshed based on selected locale and difficulty
 GDD Trace: GDDv1.1.md#content--localization-final
 Dependencies: TK-0011, TK-0012
 Acceptance Criteria:
+
 - File `Assets/Scripts/Content/PassageListBuilder.cs` created
 - Filters by locale + optional difficulty toggle
 - Handles empty lists without error
@@ -213,6 +233,7 @@ Outcome: Design defines strict mode caret cadence integration with VAD
 GDD Trace: GDDv1.1.md#caretstrictness
 Dependencies: None
 Acceptance Criteria:
+
 - File `Documents/design/US-004-design.md` created
 - Defines interface for caret advancement events
 - Specifies cadence parameterization (words per seconds window)
@@ -223,6 +244,7 @@ Outcome: Timer counts only when both voice active and cadence satisfied
 GDD Trace: GDDv1.1.md#caretstrictness
 Dependencies: TK-0003, TK-0014
 Acceptance Criteria:
+
 - Modification or extension class integrates caret events with existing timer
 - Cadence threshold adjustable via settings key `strictCaretCadence`
 - Fallback path leaves relaxed mode unchanged
@@ -234,6 +256,7 @@ Outcome: `SettingsStore` loads and persists settings.json values
 GDD Trace: GDDv1.1.md#settings--logs-json-locked
 Dependencies: TK-0001
 Acceptance Criteria:
+
 - File `Assets/Scripts/Config/SettingsStore.cs` created
 - Provides strongly typed accessors for settings
 - Uses default values when file missing
@@ -245,6 +268,7 @@ Outcome: `LogWriter` appends session summary safely to logs.json
 GDD Trace: GDDv1.1.md#settings--logs-json-locked
 Dependencies: TK-0007
 Acceptance Criteria:
+
 - File `Assets/Scripts/Logging/LogWriter.cs` created
 - Appends session object with timestamp, passageId, secondsCounted, goalMet
 - Rolling in-memory cache prevents duplicate write on fast repeat
@@ -256,6 +280,7 @@ Outcome: Basic Reading View displaying passage text, timer, voice indicator, end
 GDD Trace: GDDv1.1.md#uxui-lean
 Dependencies: TK-0004, TK-0013
 Acceptance Criteria:
+
 - Prefab `ReadingView.prefab` exists
 - Timer updates visually at least 2Hz
 - Voice indicator toggles within 150ms of state change
@@ -267,6 +292,7 @@ Outcome: Reward screen reflects new total with animation integration point
 GDD Trace: GDDv1.1.md#uxui-lean
 Dependencies: TK-0009
 Acceptance Criteria:
+
 - Prefab `RewardScreen.prefab` exists
 - Displays token total updated from TokenManager
 - Provides Back to Home button functioning
@@ -278,6 +304,7 @@ Outcome: Home screen locale toggle updates passage list + UI strings
 GDD Trace: GDDv1.1.md#uxui-lean
 Dependencies: TK-0012, TK-0013
 Acceptance Criteria:
+
 - Control present on home screen UI prefab
 - Changing value triggers SetLocale and list refresh
 - Disabled state when only one locale present
