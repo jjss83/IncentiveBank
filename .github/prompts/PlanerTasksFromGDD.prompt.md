@@ -16,6 +16,7 @@ GLOBAL PRINCIPLES (ENFORCED)
 8. Iterative: Prefer vertical slices (playable, testable increments) over broad scaffolding.
 9. Consistency: Task IDs follow IT<N>-NNN (zero‑padded) where <N> = iteration number.
 10. Estimates: Use one of XS | S | M (≈ under 1h, under 1/2 day, up to 1 day).
+11. Design-First: Each User Story has exactly one initial Design task (Type: Design) producing a lightweight design doc; all other tasks for that Story depend on it.
 
 PLAN GENERATION
 INPUTS
@@ -77,105 +78,136 @@ Acceptance Criteria:
 - Invalid JSON falls back safely
 
 ## Tasks
-### IT<N>-001 Implement mic calibration service (Story: US<N>-01, Type: Code, Est: S)
-Outcome: `MicCalibrationService` computes ambient RMS over 2–3 seconds and exposes noise floor.
+
+### IT<N>-001 US<N>-01 design doc (Story: US<N>-01, Type: Design, Est: S)
+Outcome: Lightweight design document outlining approach for calibration, VAD, timing, and UI indicators.
 GDD Trace: GDDv1.1.md#VAD-voice-activity-detection
 Dependencies: None
+Acceptance Criteria:
+- File `Documents/design/US<N>-01-design.md` created
+- Sections: Purpose, Scope, Data Flow, Key Classes, Sequence, Risks, Decisions, Open Questions
+- At least 1 risk + 1 open question captured
+- Decisions section present for later append-only changes
+
+### IT<N>-002 Mic calibration service (Story: US<N>-01, Type: Code, Est: S)
+Outcome: `MicCalibrationService` computes ambient RMS over 2–3 seconds and exposes noise floor.
+GDD Trace: GDDv1.1.md#VAD-voice-activity-detection
+Dependencies: IT<N>-001
 Acceptance Criteria:
 - Class `MicCalibrationService` created under `Assets/Scripts/Audio/`
 - Public async Calibrate() completes <=3s
 - Returns float floor value stable within ±5% on repeated runs
 - Zero GC allocations after first call
 
-### IT<N>-002 Voice activity detector component (Story: US<N>-01, Type: Code, Est: M)
+### IT<N>-003 Voice activity detector component (Story: US<N>-01, Type: Code, Est: M)
 Outcome: `VoiceActivityDetector` uses hysteresis & debounce to produce VoiceActive flag.
 GDD Trace: GDDv1.1.md#VAD-voice-activity-detection
-Dependencies: IT<N>-001
+Dependencies: IT<N>-001, IT<N>-002
 Acceptance Criteria:
 - Component script at `Assets/Scripts/Audio/VoiceActivityDetector.cs`
 - Hysteresis enter/exit thresholds configurable in Inspector
 - Debounce of 600ms prevents flicker in test harness
 - Per-frame Update allocs = 0 (verified over 5k frames)
 
-### IT<N>-003 Session time accumulator (Story: US<N>-01, Type: Code, Est: S)
+### IT<N>-004 Session time accumulator (Story: US<N>-01, Type: Code, Est: S)
 Outcome: Aggregates active voice seconds and exposes progress toward goal.
 GDD Trace: GDDv1.1.md#Core-Loops
-Dependencies: IT<N>-002
+Dependencies: IT<N>-001, IT<N>-003
 Acceptance Criteria:
 - Class `ReadingSessionTimer` with Start/Reset/GetElapsedSeconds
 - Only increments while VoiceActive true
 - Drift <0.1s over simulated 300s
 - Inspector shows goal + current seconds (debug)
 
-### IT<N>-004 Token grant logic (Story: US<N>-02, Type: Code, Est: S)
-Outcome: Awards token exactly once when elapsed >= goal.
-GDD Trace: GDDv1.1.md#Rewards
-Dependencies: IT<N>-003
-Acceptance Criteria:
-- Method `TryGrantToken()` returns true only on first qualification
-- Increments in-memory token count
-- Emits C# event `OnTokenGranted(int amount)`
-- Prevents double award after reset until goal re-met
-
-### IT<N>-005 Token pop feedback placeholder (Story: US<N>-02, Type: UX, Est: XS)
-Outcome: Simple scale pulse animation on token UI element.
-GDD Trace: GDDv1.1.md#Rewards
-Dependencies: IT<N>-004
-Acceptance Criteria:
-- Animation clip stored at `Assets/Animations/TokenPop.anim`
-- Plays once on OnTokenGranted
-- Duration 0.2–0.4s ease-out
-- No console warnings
-
-### IT<N>-006 Persist logs.json entry (Story: US<N>-02, Type: Config, Est: S)
-Outcome: Appends session data to `logs.json` after token grant.
-GDD Trace: GDDv1.1.md#Settings-Logs-JSON-locked
-Dependencies: IT<N>-004
-Acceptance Criteria:
-- File path configurable via settings contentRoot
-- JSON append preserves previous sessions
-- tokensAwarded field matches runtime increment
-- IO failure logs single warning only
-
-### IT<N>-007 Load settings.json with defaults (Story: US<N>-03, Type: Config, Est: S)
-Outcome: Loads settings or generates default file.
-GDD Trace: GDDv1.1.md#Settings-Logs-JSON-locked
-Dependencies: None
-Acceptance Criteria:
-- File read at startup before systems initialize
-- Missing file triggers creation with defaults
-- Invalid JSON triggers safe default + warning
-- Exposes immutable Settings model to other systems
-
-### IT<N>-008 Manifest & passage load (Story: US<N>-03, Type: Code, Est: S)
-Outcome: Parses manifest groups and first passage body.
-GDD Trace: GDDv1.1.md#Content-Localization-final
-Dependencies: IT<N>-007
-Acceptance Criteria:
-- Manifest groups count >0
-- At least one passage with non-empty body
-- Missing listed file logs warning, continues
-- Provides API: GetPassages(locale)
-
-### IT<N>-009 Reading View minimal UI (Story: US<N>-01, Type: UX, Est: M)
+### IT<N>-005 Reading View minimal UI (Story: US<N>-01, Type: UX, Est: M)
 Outcome: Displays passage, active voice indicator, and progress timer.
 GDD Trace: GDDv1.1.md#UX-UI-lean
-Dependencies: IT<N>-003, IT<N>-008
+Dependencies: IT<N>-001, IT<N>-004
 Acceptance Criteria:
 - TextMeshPro displays loaded passage (line breaks preserved)
 - Voice indicator toggles <300ms after state change
 - Progress timer updates each second
 - End Session button invokes cleanup stub
 
+### IT<N>-006 US<N>-02 design doc (Story: US<N>-02, Type: Design, Est: S)
+Outcome: Design for reward evaluation & feedback (token grant, feedback animation, logging, navigation updates).
+GDD Trace: GDDv1.1.md#Rewards
+Dependencies: None
+Acceptance Criteria:
+- File `Documents/design/US<N>-02-design.md` created
+- Sections: Purpose, Reward Flow (sequence), Data Model (token count), Events, UI Feedback, Risks, Decisions
+- At least 1 mitigation for duplicate-grant risk
+- References session timer output contract
+
+### IT<N>-007 Token grant logic (Story: US<N>-02, Type: Code, Est: S)
+Outcome: Awards token exactly once when elapsed >= goal.
+GDD Trace: GDDv1.1.md#Rewards
+Dependencies: IT<N>-006, IT<N>-004
+Acceptance Criteria:
+- Method `TryGrantToken()` returns true only on first qualification
+- Increments in-memory token count
+- Emits C# event `OnTokenGranted(int amount)`
+- Prevents double award after reset until goal re-met
+
+### IT<N>-008 Token pop feedback placeholder (Story: US<N>-02, Type: UX, Est: XS)
+Outcome: Simple scale pulse animation on token UI element.
+GDD Trace: GDDv1.1.md#Rewards
+Dependencies: IT<N>-006, IT<N>-007
+Acceptance Criteria:
+- Animation clip stored at `Assets/Animations/TokenPop.anim`
+- Plays once on OnTokenGranted
+- Duration 0.2–0.4s ease-out
+- No console warnings
+
+### IT<N>-009 Persist logs.json entry (Story: US<N>-02, Type: Config, Est: S)
+Outcome: Appends session data to `logs.json` after token grant.
+GDD Trace: GDDv1.1.md#Settings-Logs-JSON-locked
+Dependencies: IT<N>-006, IT<N>-007
+Acceptance Criteria:
+- File path configurable via settings contentRoot
+- JSON append preserves previous sessions
+- tokensAwarded field matches runtime increment
+- IO failure logs single warning only
+
 ### IT<N>-010 Home screen + navigation (Story: US<N>-02, Type: UX, Est: S)
 Outcome: Home shows token total and Start Reading action.
 GDD Trace: GDDv1.1.md#UX-UI-lean
-Dependencies: IT<N>-004, IT<N>-006
+Dependencies: IT<N>-006, IT<N>-007, IT<N>-009
 Acceptance Criteria:
 - Token total updates after session completion
 - Start Reading loads Reading View scene/stack
 - Back returns to Home without leaks (no duplicate objects)
 - No missing refs in console
+
+### IT<N>-011 US<N>-03 design doc (Story: US<N>-03, Type: Design, Est: S)
+Outcome: Design for settings + content loading architecture and data validation.
+GDD Trace: GDDv1.1.md#Settings-Logs-JSON-locked
+Dependencies: None
+Acceptance Criteria:
+- File `Documents/design/US<N>-03-design.md` created
+- Sections: Purpose, File Layout, Settings Schema, Manifest Structure, Error Handling, Risks, Decisions
+- Fallback strategy documented for invalid JSON
+- Lists anticipated locales (even if only one implemented now)
+
+### IT<N>-012 Load settings.json with defaults (Story: US<N>-03, Type: Config, Est: S)
+Outcome: Loads settings or generates default file.
+GDD Trace: GDDv1.1.md#Settings-Logs-JSON-locked
+Dependencies: IT<N>-011
+Acceptance Criteria:
+- File read at startup before systems initialize
+- Missing file triggers creation with defaults
+- Invalid JSON triggers safe default + warning
+- Exposes immutable Settings model to other systems
+
+### IT<N>-013 Manifest & passage load (Story: US<N>-03, Type: Code, Est: S)
+Outcome: Parses manifest groups and first passage body.
+GDD Trace: GDDv1.1.md#Content-Localization-final
+Dependencies: IT<N>-011, IT<N>-012
+Acceptance Criteria:
+- Manifest groups count >0
+- At least one passage with non-empty body
+- Missing listed file logs warning, continues
+- Provides API: GetPassages(locale)
 
 ## Parking Lot
 - Strict mode cadence enforcement
@@ -215,11 +247,12 @@ STRUCTURE GUIDELINES
 Epic: Title + Narrative + Business Value.
 User Story: ID, Epic reference, user voice format, AC list (2–5 items).
 Implementation Task: ID, Story ref, Outcome, GDD Trace, Dependencies, Acceptance Criteria (3–7), Type, Estimate.
+Design Task: For every Story the FIRST task is a Design task (Type: Design) producing `Documents/design/US<N>-NN-design.md`. All subsequent tasks for that Story depend on it.
 Each task AC must be individually testable (no compound AND inside one bullet).
 Name concrete classes, file paths, prefabs where applicable.
 
 SUPPORTED TYPES & OPTIONAL FIELDS
-Code | UX | Config | CreateAsset | UseAsset | Test | Chore.
+Design | Code | UX | Config | CreateAsset | UseAsset | Test | Chore.
 Optional implementation notes section allowed.
 
 ESTIMATION GUIDANCE
@@ -259,6 +292,8 @@ GENERATION RULES
  - Reference precise GDD anchors (create a logical anchor if absent and note assumption)
  - Avoid future-phase placeholders inside tasks (defer to Parking Lot)
  - Never add issue / API workflow content
+	- Every Story begins with exactly one Design task (Type: Design) whose file path matches `Documents/design/US<N>-NN-design.md`
+	- All non-Design tasks for a Story list that Story's Design task ID in Dependencies
 
 SUCCESS CRITERIA
  - Plan file created at `Documents/planning/iteration-<N>.md`
@@ -267,6 +302,8 @@ SUCCESS CRITERIA
  - Story AC describe value, Task AC describe implementation verification
  - Implementation details (paths, class names) present where relevant
  - Vertical slice progression clear (loop completion path testable)
+	- Each Story contains one (and only one) Design task with correct file path
+	- All subsequent tasks depend on their Story's Design task
 
 USER COMMAND RECAP
  - "Iteration = <N>" → generate / overwrite plan
@@ -277,6 +314,7 @@ USER COMMAND RECAP
 ASSUMPTIONS (Document These If Used)
  - If GDD lacks an explicit section for a needed enabler (e.g., input wrapper), mark Notes with justification.
  - Scene naming: If no sandbox scene defined, use or create `SampleScene.unity` as sandbox.
+	- Design docs are concise (target ≤ 1 page initially) and evolve via appended Decisions section rather than new tasks.
 
 -------------------------------------------------------------------------------
 WHEN YOU START

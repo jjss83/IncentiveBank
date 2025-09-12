@@ -18,6 +18,7 @@ GLOBAL PRINCIPLES (ENFORCED)
 8. Iterative: Prefer vertical slices (playable, testable increments) over broad scaffolding.
 9. Consistency: Task IDs follow IT<N>-NNN (zero‑padded) where <N> = iteration number.
 10. Estimates: Use one of XS | S | M (≈ under 1h, under 1/2 day, up to 1 day).
+ 11. Design-First: Each User Story should have exactly one Design task (Type: Design) and all other tasks for that Story should depend on it.
 
 -------------------------------------------------------------------------------
 PHASE 2 CONTEXT
@@ -38,6 +39,10 @@ Required parse elements per Implementation Task:
  - dependencies: line starting `Dependencies:` (comma / space separated IDs)
  - acceptance criteria: bullet list after `Acceptance Criteria:` until blank line / next heading
  - notes: any optional lines after AC labeled `Notes:` / `Implementation Notes:`
+Design Task Logic:
+ - Design tasks: Type: Design. Only one permitted per Story (extra design tasks flagged).
+ - If a Story lacks a Design task, mark all its non-design tasks with status `pending-design` in preview.
+ - Non-Design tasks missing dependency on the Story's Design task produce a warning (still creatable unless user revises).
 
 PARSING RULES
  - Ignore fenced code blocks.
@@ -66,16 +71,19 @@ WORKFLOW
 3. VALIDATE
 	- Unique IDs; tasks referencing existing story; estimates in {XS,S,M}.
 	- GDD trace presence (warn if missing or not containing `GDDv1.1.md#`).
+	- One Design task per Story (warn if 0 or >1).
+	- Dependency check: each non-Design task lists its Story's Design task ID.
 4. DEDUPLICATE
 	- For each Epic/Story/Task Title: search existing Issues for exact title.
 	- Mark status: new | duplicate-existing.
 	- NOTE: Only Implementation Tasks are created as Issues by default. Provide option to create Epics/Stories as tracking Issues if user explicitly approves them.
 5. PREVIEW (Dry Run)
 	- Show tables:
-		 a) Tasks: ID | Title | Labels | Type | Est | Story | Status | AC Count
+		 a) Tasks: ID | Title | Labels | Type | Est | Story | Status | AC Count | DesignDep
 		 b) Warnings (invalid references, missing AC, missing trace)
 	- Summaries: counts (epics, stories, tasks), new vs duplicate, per type distribution.
 	- Proposed labels: `iter:<N>`, `type:<Type>`, `story:US<N>-NN`, `epic:EP<N>-NN` (for tasks), `size:<Est>`.
+	- Design compliance summary: stories with design present / missing; tasks missing design dependency.
 6. AWAIT APPROVAL
 	- Commands:
 		 * `APPROVE ALL`
@@ -83,6 +91,8 @@ WORKFLOW
 		 * `APPROVE STORIES US<N>-01 US<N>-02`
 		 * `APPROVE EPICS EP<N>-01`
 		 * `REVISE <instructions>` (adjust titles, estimates, AC appends)
+		 * `Mark IT<N>-NNN as design`
+		 * `Remove design IT<N>-NNN`
 		 * `CANCEL`
 7. CREATION
 	- Create Issues for approved Implementation Tasks (and optionally Stories/Epics if explicitly listed).
@@ -102,6 +112,8 @@ Recognized adjustments (case-insensitive):
  - `Change outcome IT<N>-NNN: <text>`
  - `Add dep IT<N>-NNN: <OtherID>`
  - `Promote US<N>-NN to create` (marks story for creation on approval ALL or if individually approved)
+	- `Mark IT<N>-NNN as design` (if no design task yet for that Story)
+	- `Remove design IT<N>-NNN` (revalidates; other tasks may become pending-design)
 Unrecognized instructions listed back to user; preview re-run after applying recognized changes.
 
 -------------------------------------------------------------------------------
@@ -116,6 +128,7 @@ ERROR HANDLING
 OUTPUT STYLE
  - Sections: Preview, Warnings, Summary, Actions, Next Steps.
  - Use fenced guidance for approval examples.
+	- Include Design Compliance subsection describing any missing design tasks or dependency violations.
 
 -------------------------------------------------------------------------------
 READY. Use: `Preview iteration <N>` to start dry-run. Then approve with the listed commands.
