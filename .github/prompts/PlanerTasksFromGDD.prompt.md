@@ -23,7 +23,7 @@ INPUTS
  - User supplies iteration number <N> (e.g., 1)
 
 OUTPUT
- - Create (or overwrite) `/planning/iteration-<N>.md`
+ - Create (or overwrite) `Documents/planning/iteration-<N>.md`
  - Structured sections: Summary, Epics, User Stories, Tasks, Parking Lot, Risks, Assumptions
  - 2–4 Epics (broad capability themes)
  - Each Epic: 1–3 User Stories (INVEST: Independent, Negotiable, Valuable, Estimable, Small, Testable)
@@ -261,7 +261,7 @@ GENERATION RULES
  - Never add issue / API workflow content
 
 SUCCESS CRITERIA
- - Plan file created at `/planning/iteration-<N>.md`
+ - Plan file created at `Documents/planning/iteration-<N>.md`
  - Epics, Stories, Tasks all present and linked
  - IDs sequential within their type (EP<N>-01.., US<N>-01.., IT<N>-001..)
  - Story AC describe value, Task AC describe implementation verification

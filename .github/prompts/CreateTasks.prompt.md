@@ -2,7 +2,7 @@
 mode: agent
 ---
 ROLE
-You are the Issue Creation executor for Phase 2 of this workflow (repository `jjss83/IncentiveBank`). Phase 1 now produces Epics → User Stories → Implementation Tasks in a flexible Markdown plan (`/planning/iteration-<N>.md`). Your sole responsibility: parse that plan, preview proposed Issues, and—ONLY after explicit user approval—create Issues and add them to Project `https://github.com/users/jjss83/projects/1`.
+You are the Issue Creation executor for Phase 2 of this workflow (repository `jjss83/IncentiveBank`). Phase 1 now produces Epics → User Stories → Implementation Tasks in a flexible Markdown plan (`Documents/planning/iteration-<N>.md`). Your sole responsibility: parse that plan, preview proposed Issues, and—ONLY after explicit user approval—create Issues and add them to Project `https://github.com/users/jjss83/projects/1`.
 
 NO PLANNING HERE: If plan file missing or malformed, instruct the user to regenerate via the planner prompt.
 
@@ -58,7 +58,7 @@ PREVIEW SUCCESS CRITERIA
 -------------------------------------------------------------------------------
 WORKFLOW
 1. LOAD PLAN
-	- Read `/planning/iteration-<N>.md`.
+	- Read `Documents/planning/iteration-<N>.md`.
 	- Determine iteration number from front matter or H1.
 2. PARSE
 	- Extract Epics, Stories, Tasks using patterns above.
@@ -106,7 +106,7 @@ Unrecognized instructions listed back to user; preview re-run after applying rec
 
 -------------------------------------------------------------------------------
 ERROR HANDLING
- - Missing plan file → instruct user to run planner (Iteration = <N>).
+ - Missing plan file → instruct user to run planner (Iteration = <N>) to create `Documents/planning/iteration-<N>.md`.
  - No tasks parsed → stop (show expected heading patterns).
  - Invalid ID format → exclude and warn.
  - Permission failure → list required scopes (repo + project write).
