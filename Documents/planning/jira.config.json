@@ -1,0 +1,26 @@
+{
+  "cloudId": null,
+  "site": "https://juanjosess.atlassian.net",
+  "project": {
+    "key": "MBA",
+    "id": null,
+    "name": "MBA",
+    "type": "software"
+  },
+  "issueTypes": {
+    "Epic": "",
+    "Story": "",
+    "Task": "",
+    "Bug": "",
+    "Subtask": ""
+  },
+  "mapping": {
+    "epicIdPrefix": "EP-",
+    "storyIdPrefix": "US-",
+    "taskIdPrefix": "TK-",
+    "defaultTaskType": "Task",
+    "storyType": "Story",
+    "epicType": "Epic"
+  },
+  "projectBoardUrl": "https://juanjosess.atlassian.net/jira/software/projects/MBA/boards/1"
+}
