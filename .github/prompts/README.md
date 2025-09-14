@@ -4,19 +4,15 @@ This directory contains reusable GitHub Copilot Chat prompt files (`*.prompt.md`
 
 ## Files
 
-1. `01-planner-from-gdd.prompt.md`
-   - Kanban backlog generator (Epics → Stories → Tasks) from `Documents/GDDv1.1.md`
-   - Output: `Documents/planning/kanban-backlog.md`
-
-2. `01-planner-from-gdd-to-epic.prompt.md`
+1. `01-planner-from-gdd-to-epic.prompt.md`
    - Interactive: propose epic titles + intents, iterate, then generate full epic files with standard sections
    - Outputs: `Documents/planning/epics/epic-XX.md`
 
-3. `02-planner-epic-unfold.prompt.md`
+2. `02-planner-epic-unfold.prompt.md`
    - Interactive: unfold a single epic → propose story titles → write full stories → add tasks with AC
    - Output: updates existing `Documents/planning/epics/epic-XX.md`
 
-4. `02-issue-creator.prompt.md`
+3. `02-issue-creator.prompt.md`
    - (Optional Phase 2) Parses the backlog and, after explicit tokenized approval, creates GitHub Issues into a ProjectV2 board
    - Enforces dry-run preview, AC grammar checks, idempotency, label conventions
 
@@ -32,17 +28,18 @@ Retired / Consolidated:
 2. Click the paperclip (Attach) → choose prompt file.
 3. Enter your command (e.g., `Iteration = 1` or `PREVIEW 1`).
 
-## Planner Usage (Backlog and Interactive)
+## Planner Usage (Interactive)
 
 Command examples:
 
 ```text
-Iteration = 1
-REVISE reduce tasks to 12 and add a logging story
-Iteration = 2
+Attach: 01-planner-from-gdd-to-epic.prompt.md
+PROPOSE EPICS
+REVISE Rename EP-01 to "Pipeline Validation"
+CONFIRM EPICS
 ```
 
-Output includes: Summary, Epics, User Stories, Tasks, Parking Lot, Risks, Assumptions, Conventions.
+Output includes: Epic files with standardized sections and anchors.
 
 Interactive Epic Flow:
 
