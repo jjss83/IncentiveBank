@@ -1,0 +1,42 @@
+name: "02 - Planner: Epic Unfold"
+
+on:
+  workflow_dispatch:
+    inputs:
+      epic:
+        description: Epic selector (e.g., EP-00 or epic-00.md)
+        required: true
+      epics_dir:
+        description: Path to epics directory
+        required: false
+        default: Documents/planning/epics
+      output:
+        description: Output file path for the selected epic
+        required: false
+        default: Documents/planning/epics/_selected-epic.md
+
+jobs:
+  unfold-epic:
+    runs-on: ubuntu-latest
+    env:
+      EPIC: ${{ github.event.inputs.epic }}
+      EPICS_DIR: ${{ github.event.inputs.epics_dir != '' && github.event.inputs.epics_dir || 'Documents/planning/epics' }}
+      OUTPUT_PATH: ${{ github.event.inputs.output != '' && github.event.inputs.output || 'Documents/planning/epics/_selected-epic.md' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Unfold Epic
+        run: |
+          python .github/scripts/planner_epic_unfold.py --epics_dir "$EPICS_DIR" --epic "$EPIC" --output "$OUTPUT_PATH"
+
+      - name: Upload Epic Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: selected-epic
+          path: ${{ env.OUTPUT_PATH }}
