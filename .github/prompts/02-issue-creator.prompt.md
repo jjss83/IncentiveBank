@@ -9,19 +9,19 @@ Purpose: Read a Kanban backlog (`Documents/planning/kanban-backlog.md`), allow a
 Safety Note: Creation should follow at least one PREVIEW in the same session to reduce user mistakes.
 
 BACKLOG ASSUMPTIONS
- - Backlog uses headings for tasks with pattern:
-   `### TK-XXXX <Title> (Story: US-XXX, Type: <Type>, Est: <XS|S|M>)`
+ - Backlog uses headings for subtasks with pattern:
+   `### <Title> (Story: US-XXX, Type: <Type>, Est: <XS|S|M>)`
  - Story headings pattern:
    `#### US-XXX (Epic: EP-XX)` with AC list
  - Epic headings pattern:
    `### EP-XX <Epic Title>` with Narrative/Business Value lines
- - Lines within a task block may include (case-insensitive labels): Outcome:, GDD Trace:, Dependencies:, Acceptance Criteria:, Notes:, Status:
+ - Lines within a subtask block may include (case-insensitive labels): Outcome:, GDD Trace:, Dependencies:, Acceptance Criteria:, Notes:, Status:
 
-DERIVED FIELDS PER TASK
+DERIVED FIELDS PER SUBTASK
 id | title | story | epic | type | estimate | outcome | gddTrace | dependencies | acceptanceCriteria | notes | status
 
 AC GRAMMAR RULES (ENFORCE / WARN)
- - 3–7 bullets per task
+ - 3–7 bullets per subtask
  - No trailing punctuation (period, semicolon, ellipsis)
  - No "and/or" substrings (flag if present)
  - Each bullet describes a single objective check (avoid multiple verbs)
@@ -34,17 +34,17 @@ LABEL / FIELD CONVENTIONS
 IDEMPOTENCY CHECKLIST
 1. Exact title match with existing Issue → mark `duplicate-existing` (skip creation unless user forces with explicit ID in APPROVE list; still skipped but reported)
 2. Re-run PREVIEW to reflect new state after any external manual issue creation.
-3. Task with same ID appearing twice → mark conflict and exclude second unless retitled.
+3. Subtask with same ID appearing twice → mark conflict and exclude second unless retitled.
 
 COMMAND LEXICON
  - `PREVIEW` → parse backlog and show dry-run (default entire file)
- - `PREVIEW RANGE <fromID> <toID>` → limit to inclusive ID range (e.g., TK-0005 TK-0012)
+ - `PREVIEW RANGE <fromID> <toID>` → limit to inclusive ID range (e.g., SUB-0005 SUB-0012)
  - `PREVIEW CHANGES` → re-parse after manual file edits
- - `CREATE ALL` → immediately create all eligible (non-duplicate) tasks (and only tasks)
- - `CREATE TASKS TK-0001 TK-0004` → create only the listed task IDs
+ - `CREATE ALL` → immediately create all eligible (non-duplicate) subtasks (and only subtasks)
+ - `CREATE SUBTASKS SUB-0001 SUB-0004` → create only the listed subtask IDs
  - `CREATE STORIES US-001` → create Story issues (with Story AC) (stories only)
  - `CREATE EPICS EP-01` → create Epic issues (epics only)
- - `CREATE MIXED EP-01 US-001 TK-0004 TK-0005` → create explicit list of epics/stories/tasks
+ - `CREATE MIXED EP-01 US-001 SUB-0004 SUB-0005` → create explicit list of epics/stories/subtasks
  - `REVISE <instructions>` → mutate parsed in-memory model then re-run preview (patterns below)
  - `CANCEL` → clear pending revision context (no effect on already created issues)
 
@@ -52,24 +52,24 @@ APPROVAL TOKEN
  - Removed (no longer required). All CREATE commands execute immediately after parsing current model.
 
 REVISION PATTERNS
- - `Change TK-0007 Est to S`
- - `Retitle TK-0003: Player HUD displays score`
- - `Add AC TK-0005: Score persists after scene reload`
- - `Replace outcome TK-0002: New outcome text`
- - `Add dep TK-0010: TK-0002`
- - `Remove dep TK-0010: TK-0002`
- - `Mark TK-0001 as design` / `Unmark TK-0001 design`
+ - `Change SUB-0007 Est to S`
+ - `Retitle SUB-0003: Player HUD displays score`
+ - `Add AC SUB-0005: Score persists after scene reload`
+ - `Replace outcome SUB-0002: New outcome text`
+ - `Add dep SUB-0010: SUB-0002`
+ - `Remove dep SUB-0010: SUB-0002`
+ - `Mark SUB-0001 as design` / `Unmark SUB-0001 design`
 Unrecognized instructions are listed back under Warnings.
 
 WORKFLOW
 1. LOAD & VALIDATE
    - Open `Documents/planning/kanban-backlog.md`. If missing → instruct user to run planner.
-   - Parse Epics, Stories, Tasks by heading patterns.
+   - Parse Epics, Stories, Subtasks by heading patterns.
    - Extract DERIVED FIELDS. Collect warnings: missing outcome, missing gddTrace, AC count out of range, forbidden punctuation, contains "and/or".
-2. DESIGN TASK CHECKS
-   - For each Story ensure exactly one Design task (Type: Design) present. If zero or >1 → warn. Non-design tasks missing dependency on design ID flagged.
+2. DESIGN SUBTASK CHECKS
+   - For each Story ensure exactly one Design subtask (Type: Design) present. If zero or >1 → warn. Non-design subtasks missing dependency on design ID flagged.
 3. DEDUPLICATION PASS
-   - For each task title search existing Issues & Project items (exact match). Status: `new` | `duplicate-existing`.
+   - For each subtask title search existing Issues & Project items (exact match). Status: `new` | `duplicate-existing`.
 4. PREVIEW OUTPUT (Recommended before any CREATE)
    - Sections: Preview, Warnings, Summary, Actions.
    - Table: ID | Title | Labels | Type | Est | Story | Status | AC Count | TraceOK | DesignDepOK
@@ -80,13 +80,13 @@ WORKFLOW
    - Create Issues for requested non-duplicate IDs; optionally Epics/Stories when requested.
    - Add each to ProjectV2 board `https://github.com/users/jjss83/projects/3/`; set fields when present (ignore quietly if absent).
 6. REPORT
-   - Table: ID | Title | Kind(epic|story|task) | Status(created|skipped-duplicate|failed) | IssueURL
+   - Table: ID | Title | Kind(epic|story|subtask) | Status(created|skipped-duplicate|failed) | IssueURL
    - Summaries: created / skipped / failed.
    - Any warnings persisted.
 
 ERROR HANDLING
  - Missing backlog file → actionable guidance.
- - Parsing yields zero tasks → show expected heading pattern.
+ - Parsing yields zero subtasks → show expected heading pattern.
  - Permission errors → list required scopes: `repo`, `project` (user scope), `issues`.
  - Network partial failures: continue others; report aggregate.
 
@@ -110,7 +110,7 @@ OUTPUT STYLE
 SECURITY / SAFETY GUARDS
  - Never create Issues on PREVIEW.
  - Strongly recommend user performs PREVIEW once per session before CREATE.
- - Echo back tasks to be created before executing each CREATE command.
+ - Echo back subtasks to be created before executing each CREATE command.
 
 READY COMMAND PROMPT
 Start with: `PREVIEW`
