@@ -5,13 +5,20 @@ This directory contains reusable GitHub Copilot Chat prompt files (`*.prompt.md`
 ## Files
 
 1. `01-planner-from-gdd.prompt.md`
-   - Phase 1: Generates a human-readable iteration plan (Epics → User Stories → Implementation Tasks) from `Documents/GDDv1.1.md`.
-   - Output: `Documents/planning/iteration-<N>.md` (created or overwritten).
-   - No GitHub API calls (planning only).
+   - Kanban backlog generator (Epics → Stories → Tasks) from `Documents/GDDv1.1.md`
+   - Output: `Documents/planning/kanban-backlog.md`
 
-2. `02-issue-creator.prompt.md`
-   - Phase 2: Parses the iteration plan and—after explicit tokenized approval—creates GitHub Issues and adds them to the USER ProjectV2 board (`https://github.com/users/<user>/projects/1`).
-   - Enforces dry-run preview, AC grammar checks, idempotency, label conventions.
+2. `01-planner-from-gdd-to-epic.prompt.md`
+   - Interactive: propose epic titles + intents, iterate, then generate full epic files with standard sections
+   - Outputs: `Documents/planning/epics/epic-XX.md`
+
+3. `02-planner-epic-unfold.prompt.md`
+   - Interactive: unfold a single epic → propose story titles → write full stories → add tasks with AC
+   - Output: updates existing `Documents/planning/epics/epic-XX.md`
+
+4. `02-issue-creator.prompt.md`
+   - (Optional Phase 2) Parses the backlog and, after explicit tokenized approval, creates GitHub Issues into a ProjectV2 board
+   - Enforces dry-run preview, AC grammar checks, idempotency, label conventions
 
 Retired / Consolidated:
 
@@ -25,7 +32,7 @@ Retired / Consolidated:
 2. Click the paperclip (Attach) → choose prompt file.
 3. Enter your command (e.g., `Iteration = 1` or `PREVIEW 1`).
 
-## Phase 1 Usage (Planner)
+## Planner Usage (Backlog and Interactive)
 
 Command examples:
 
@@ -36,6 +43,28 @@ Iteration = 2
 ```
 
 Output includes: Summary, Epics, User Stories, Tasks, Parking Lot, Risks, Assumptions, Conventions.
+
+Interactive Epic Flow:
+
+```text
+Attach: 01-planner-from-gdd-to-epic.prompt.md
+Command: PROPOSE EPICS
+REVISE Rename EP-01 to "Pipeline Validation"
+CONFIRM EPICS
+```
+
+Interactive Epic Unfold Flow:
+
+```text
+Attach: 02-planner-epic-unfold.prompt.md
+Command: PROPOSE STORIES EP-00
+REVISE STORIES Split Android+iOS into separate stories
+CONFIRM STORIES
+WRITE STORY US-003
+CONFIRM STORY US-003
+PROPOSE TASKS US-003
+CONFIRM TASKS US-003
+```
 
 Acceptance Criteria rules (tasks): 3–7 bullets, objective, no trailing punctuation, no `and/or`.
 
