@@ -1,0 +1,63 @@
+name: "Create Feature Branch"
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_title:
+        description: Short feature title (e.g., Add splash bootstrap)
+        required: true
+      base:
+        description: Base branch to branch from
+        required: false
+        default: main
+      prefix:
+        description: Branch prefix (feature|chore|fix)
+        required: false
+        default: feature
+
+permissions:
+  contents: write
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute branch name
+        id: name
+        run: |
+          raw_title="${{ github.event.inputs.feature_title }}"
+          # slugify: lower, replace spaces/invalids with '-', collapse repeats, trim to 60 chars
+          slug=$(echo "$raw_title" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g; s/^(.{1,60}).*$/\1/')
+          stamp=$(date +%Y%m%d)
+          user=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')
+          prefix="${{ github.event.inputs.prefix || 'feature' }}"
+          branch="$prefix/$user/$slug-$stamp"
+          echo "branch=$branch" >> $GITHUB_OUTPUT
+
+      - name: Create branch from base if not exists
+        id: create
+        shell: bash
+        run: |
+          base="${{ github.event.inputs.base || 'main' }}"
+          branch="${{ steps.name.outputs.branch }}"
+          git fetch origin "$base" --depth=1
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "Branch already exists on origin: $branch"
+            echo "created=false" >> $GITHUB_OUTPUT
+          else
+            git checkout -B "$branch" "origin/$base"
+            git push -u origin "$branch"
+            echo "created=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          branch="${{ steps.name.outputs.branch }}"
+          echo "Created/confirmed branch: $branch" >> $GITHUB_STEP_SUMMARY
+          echo "URL: https://github.com/${{ github.repository }}/tree/$branch" >> $GITHUB_STEP_SUMMARY
