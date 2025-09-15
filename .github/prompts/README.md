@@ -9,12 +9,16 @@ This directory contains reusable GitHub Copilot Chat prompt files (`*.prompt.md`
    - Output: `Documents/planning/kanban-backlog.md`
 
 2. `01-planner-from-gdd-to-epic.prompt.md`
-   - Interactive: propose epic titles + intents, iterate, then generate full epic files with standard sections
-   - Outputs: `Documents/planning/epics/epic-XX.md`
+   - Interactive: propose epic titles + intents, iterate, then output a single consolidated list
+   - Output: `Documents/planning/epics/epics.md` (confirmed epics only)
 
-3. `02-planner-epic-unfold.prompt.md`
-   - Interactive: unfold a single epic → propose story titles → write full stories → add tasks with AC
-   - Output: updates existing `Documents/planning/epics/epic-XX.md`
+3. `02-planner-epic-unfold.md`
+   - Interactive (multi-phase):
+     1) Enrich `epic-XX.md` overview sections and confirm
+     2) Propose story titles, iterate, confirm
+     3) Write full stories, confirm
+     4) Propose tasks with types/estimates, iterate, confirm with AC
+   - Output: updates `Documents/planning/epics/epic-XX.md`
 
 4. `02-issue-creator.prompt.md`
    - (Optional Phase 2) Parses the backlog and, after explicit tokenized approval, creates GitHub Issues into a ProjectV2 board
@@ -44,7 +48,7 @@ Iteration = 2
 
 Output includes: Summary, Epics, User Stories, Tasks, Parking Lot, Risks, Assumptions, Conventions.
 
-Interactive Epic Flow:
+Interactive Epic Flow (01 → single list):
 
 ```text
 Attach: 01-planner-from-gdd-to-epic.prompt.md
@@ -53,11 +57,13 @@ REVISE Rename EP-01 to "Pipeline Validation"
 CONFIRM EPICS
 ```
 
-Interactive Epic Unfold Flow:
+Interactive Epic Unfold Flow (02 → enrich then stories/tasks):
 
 ```text
-Attach: 02-planner-epic-unfold.prompt.md
-Command: PROPOSE STORIES EP-00
+Attach: 02-planner-epic-unfold.md
+Command: ENRICH EPIC EP-00
+CONFIRM EPIC EP-00
+PROPOSE STORIES EP-00
 REVISE STORIES Split Android+iOS into separate stories
 CONFIRM STORIES
 WRITE STORY US-003

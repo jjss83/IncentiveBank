@@ -1,0 +1,242 @@
+name: Commit Changes with Approval
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_prefix:
+        description: Optional prefix for the commit subject (e.g., feat, chore)
+        required: false
+        type: string
+        default: ""
+      target_branch:
+        description: Target branch to push to (defaults to the branch the workflow runs on)
+        required: false
+        type: string
+        default: ""
+      pr_fallback:
+        description: If direct push is blocked, open a PR from a temporary branch
+        required: true
+        type: boolean
+        default: true
+  workflow_call:
+    inputs:
+      commit_prefix:
+        required: false
+        type: string
+        default: ""
+      target_branch:
+        required: false
+        type: string
+        default: ""
+      pr_fallback:
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: auto-commit-${{ github.ref }}
+  cancel-in-progress: false
+
+env: {}
+
+jobs:
+  prepare:
+    name: Prepare commit summary
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.detect.outputs.has_changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        id: detect
+        shell: bash
+        run: |
+          git status --porcelain=v1 > changes.txt
+          CHANGED=$(wc -l < changes.txt | tr -d ' ')
+          if [ "$CHANGED" -gt 0 ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate commit message
+        if: steps.detect.outputs.has_changes == 'true'
+        id: genmsg
+        shell: bash
+        run: |
+          TS=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          COUNT=$(wc -l < changes.txt | tr -d ' ')
+          SUBJECT="chore: auto-commit ${COUNT} change(s) on ${TS}"
+          {
+            echo "$SUBJECT"
+            echo
+            echo "Summary"
+            echo "- Actor: $GITHUB_ACTOR"
+            echo "- Ref:   $GITHUB_REF ($GITHUB_REF_NAME)"
+            echo "- SHA:   ${GITHUB_SHA:0:7}"
+            echo
+            echo "Changed files (git status porcelain):"
+            echo '```'
+            cat changes.txt
+            echo '```'
+          } > commit_msg.txt
+
+          # Also render a job summary for human reviewers
+          {
+            echo "# Auto-commit preview"
+            echo
+            echo "Proposed commit subject:"
+            echo
+            echo "\`$SUBJECT\`"
+            echo
+            echo "## Changed files"
+            echo '```'
+            cat changes.txt
+            echo '```'
+            echo
+            echo "This job will wait for approval before committing and pushing."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload commit artifacts
+        if: steps.detect.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-commit-payload
+          path: |
+            changes.txt
+            commit_msg.txt
+
+  commit:
+    name: Commit and push (with approval)
+    needs: prepare
+    if: needs.prepare.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    # Require a protected environment with reviewers to approve before executing
+    environment:
+      name: commit-approval
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve target branch
+        id: resolve
+        shell: bash
+        run: |
+          TB="${{ inputs.target_branch }}"
+          if [ -z "$TB" ]; then
+            TB="$GITHUB_REF_NAME"
+          fi
+          echo "Resolved target branch: $TB"
+          echo "value=$TB" >> "$GITHUB_OUTPUT"
+
+      - name: Download commit artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: auto-commit-payload
+          path: ./.autocommit
+
+      - name: Configure git user
+        shell: bash
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Stage all changes
+        shell: bash
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit; exiting"
+            echo "No changes detected at commit stage" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+      - name: Compose final commit message
+        id: msg
+        shell: bash
+        env:
+          COMMIT_PREFIX: ${{ inputs.commit_prefix }}
+        run: |
+          if [ -f ./.autocommit/commit_msg.txt ]; then
+            cp ./.autocommit/commit_msg.txt commit_msg_final.txt
+          else
+            # Fallback if artifact missing; synthesize a simple message
+            TS=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            COUNT=$(git diff --cached --name-only | wc -l | tr -d ' ')
+            echo "chore: auto-commit ${COUNT} change(s) on ${TS}" > commit_msg_final.txt
+          fi
+          if [ -n "$COMMIT_PREFIX" ]; then
+            # Prefix the subject line
+            SUBJECT=$(head -n 1 commit_msg_final.txt)
+            BODY=$(tail -n +2 commit_msg_final.txt || true)
+            echo "${COMMIT_PREFIX}: ${SUBJECT}" > commit_msg_final.txt
+            if [ -n "$BODY" ]; then
+              echo >> commit_msg_final.txt
+              echo "$BODY" >> commit_msg_final.txt
+            fi
+          fi
+          echo "subject=$(head -n 1 commit_msg_final.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          git commit -F commit_msg_final.txt --no-verify
+
+      - name: Push to target branch
+        id: push
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -e
+          TARGET_BRANCH='${{ steps.resolve.outputs.value }}'
+          echo "Pushing to $TARGET_BRANCH"
+          git push origin HEAD:"$TARGET_BRANCH"
+
+      - name: Create PR fallback branch
+        if: steps.push.outcome == 'failure' && inputs.pr_fallback == true
+        id: prbranch
+        shell: bash
+        run: |
+          set -e
+          NEW_BRANCH="auto/commit-$(date -u +%Y%m%d-%H%M%S)"
+          echo "Creating fallback branch $NEW_BRANCH"
+          git checkout -b "$NEW_BRANCH"
+          git push origin "$NEW_BRANCH"
+          echo "name=$NEW_BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request (fallback)
+        if: steps.push.outcome == 'failure' && inputs.pr_fallback == true
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: ${{ steps.msg.outputs.subject }}
+          title: ${{ steps.msg.outputs.subject }}
+          body: |
+            Auto-generated commit could not be pushed to `${{ steps.resolve.outputs.value }}` due to branch protection or permissions.
+            This PR contains the same changes from the fallback branch.
+          branch: ${{ steps.prbranch.outputs.name }}
+          base: ${{ steps.resolve.outputs.value }}
+          labels: auto-commit
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          echo "# Commit result" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.push.outcome }}" = "success" ]; then
+            echo "Pushed directly to ${{ steps.resolve.outputs.value }}" >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ steps.prbranch.outcome }}" = "success" ]; then
+            echo "Opened a PR from branch \`${{ steps.prbranch.outputs.name }}\`" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No action taken (likely no changes) or push/PR failed" >> "$GITHUB_STEP_SUMMARY"
+          fi
