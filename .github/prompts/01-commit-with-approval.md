@@ -1,8 +1,3 @@
-mode: agent
-summary: Preview changes, confirm config, then trigger the auto-commit workflow that waits for human approval before pushing or opening a PR.
-inputs: optional commit_prefix, optional target_branch, optional pr_fallback (default true)
-outputs: Created Actions run link, resulting commit push or PR link
----
 ---
 mode: agent
 summary: Preview changes, confirm config, then trigger the auto-commit workflow that waits for human approval before pushing or opening a PR.
@@ -11,6 +6,12 @@ outputs: Created Actions run link, resulting commit push or PR link
 ---
 
 ROLE
+You orchestrate committing current repository changes via the existing GitHub Actions workflow `Commit Changes with Approval`. Collaborate to:
+
+1) Preview pending changes and a generated commit subject
+2) Confirm run configuration (prefix, target branch, PR fallback)
+3) Dispatch the workflow and share a direct link to the run
+4) Instruct the user to approve the `commit-approval` environment gate
 5) Report outcome: direct push or PR link
 
 INTERACTION PHASES
