@@ -5,16 +5,18 @@ This directory contains reusable GitHub Copilot Chat prompt files (`*.prompt.md`
 ## Files
 
 1. `01-planner-from-gdd-to-epic.prompt.md`
-   - Interactive: propose epic titles + intents, iterate, then generate full epic files with standard sections
-   - Outputs: `Documents/planning/epics/epic-XX.md`
+   - Interactive: propose epic titles + intents from `Documents/GDDv1.1.md`, iterate, then output a single consolidated list
+   - Output: `Documents/planning/epics/epics.md` (confirmed epics only)
 
 2. `02-planner-epic-unfold.prompt.md`
-   - Interactive: unfold a single epic → propose story titles → write full stories → add tasks with AC
+   - Interactive: unfold a single epic → enrich overview → propose story titles → write full stories → add tasks with AC
    - Output: updates existing `Documents/planning/epics/epic-XX.md`
 
-3. `02-issue-creator.prompt.md`
-   - (Optional Phase 2) Parses the backlog and, after explicit tokenized approval, creates GitHub Issues into a ProjectV2 board
-   - Enforces dry-run preview, AC grammar checks, idempotency, label conventions
+Optional (planned):
+
+- `02-issue-creator.prompt.md`
+  - Parses the backlog and, after explicit tokenized approval, creates GitHub Issues into a ProjectV2 board
+  - Enforces dry-run preview, AC grammar checks, idempotency, label conventions
 
 Retired / Consolidated:
 
@@ -26,7 +28,7 @@ Retired / Consolidated:
 
 1. Open Copilot Chat (`Ctrl+I`).
 2. Click the paperclip (Attach) → choose prompt file.
-3. Enter your command (e.g., `Iteration = 1` or `PREVIEW 1`).
+3. Enter your command (e.g., `PROPOSE EPICS` or `ENRICH EPIC EP-00`).
 
 ## Planner Usage (Interactive)
 
@@ -39,22 +41,15 @@ REVISE Rename EP-01 to "Pipeline Validation"
 CONFIRM EPICS
 ```
 
-Output includes: Epic files with standardized sections and anchors.
+Output: A single list `Documents/planning/epics/epics.md` with confirmed Epics.
 
-Interactive Epic Flow:
-
-```text
-Attach: 01-planner-from-gdd-to-epic.prompt.md
-Command: PROPOSE EPICS
-REVISE Rename EP-01 to "Pipeline Validation"
-CONFIRM EPICS
-```
-
-Interactive Epic Unfold Flow:
+Interactive Epic Unfold Flow (02 → enrich then stories/tasks):
 
 ```text
 Attach: 02-planner-epic-unfold.prompt.md
-Command: PROPOSE STORIES EP-00
+Command: ENRICH EPIC EP-00
+CONFIRM EPIC EP-00
+PROPOSE STORIES EP-00
 REVISE STORIES Split Android+iOS into separate stories
 CONFIRM STORIES
 WRITE STORY US-003
@@ -105,6 +100,7 @@ Labels automatically (or implicitly) used:
 - `size:<XS|S|M>`
 - `story:US<N>-NN` (on tasks)
 - `epic:EP<N>-NN` (on tasks)
+
 Optional heuristic: `area:<token>` from GDD anchor segment.
 
 ProjectV2 attempted fields (ignored if absent): Status=Backlog, Iteration, Estimate, Type.
@@ -115,7 +111,8 @@ All tasks include `GDD Trace: GDDv1.1.md#<anchor>` where `<anchor>` follows GitH
 
 ## Outcome vs Activity
 
-Prefer: `Voice activity detector exposes stable Active flag`  
+Prefer: `Voice activity detector exposes stable Active flag`
+
 Avoid: `Implement voice detection` (activity-focused)
 
 ## Good vs Bad Task Examples
