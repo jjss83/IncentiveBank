@@ -4,14 +4,19 @@ This directory contains reusable GitHub Copilot Chat prompt files (`*.prompt.md`
 
 ## Files
 
-1. `01-planner-from-gdd.prompt.md`
-   - Phase 1: Generates a human-readable iteration plan (Epics → User Stories → Implementation Tasks) from `Documents/GDDv1.1.md`.
-   - Output: `Documents/planning/iteration-<N>.md` (created or overwritten).
-   - No GitHub API calls (planning only).
+1. `01-planner-from-gdd-to-epic.prompt.md`
+   - Interactive: propose epic titles + intents from `Documents/GDDv1.1.md`, iterate, then output a single consolidated list
+   - Output: `Documents/planning/epics/epics.md` (confirmed epics only)
 
-2. `02-issue-creator.prompt.md`
-   - Phase 2: Parses the iteration plan and—after explicit tokenized approval—creates GitHub Issues and adds them to the USER ProjectV2 board (`https://github.com/users/<user>/projects/1`).
-   - Enforces dry-run preview, AC grammar checks, idempotency, label conventions.
+2. `02-planner-epic-unfold.prompt.md`
+   - Interactive: unfold a single epic → enrich overview → propose story titles → write full stories → add tasks with AC
+   - Output: updates existing `Documents/planning/epics/epic-XX.md`
+
+Optional (planned):
+
+- `02-issue-creator.prompt.md`
+  - Parses the backlog and, after explicit tokenized approval, creates GitHub Issues into a ProjectV2 board
+  - Enforces dry-run preview, AC grammar checks, idempotency, label conventions
 
 Retired / Consolidated:
 
@@ -23,19 +28,35 @@ Retired / Consolidated:
 
 1. Open Copilot Chat (`Ctrl+I`).
 2. Click the paperclip (Attach) → choose prompt file.
-3. Enter your command (e.g., `Iteration = 1` or `PREVIEW 1`).
+3. Enter your command (e.g., `PROPOSE EPICS` or `ENRICH EPIC EP-00`).
 
-## Phase 1 Usage (Planner)
+## Planner Usage (Interactive)
 
 Command examples:
 
 ```text
-Iteration = 1
-REVISE reduce tasks to 12 and add a logging story
-Iteration = 2
+Attach: 01-planner-from-gdd-to-epic.prompt.md
+PROPOSE EPICS
+REVISE Rename EP-01 to "Pipeline Validation"
+CONFIRM EPICS
 ```
 
-Output includes: Summary, Epics, User Stories, Tasks, Parking Lot, Risks, Assumptions, Conventions.
+Output: A single list `Documents/planning/epics/epics.md` with confirmed Epics.
+
+Interactive Epic Unfold Flow (02 → enrich then stories/tasks):
+
+```text
+Attach: 02-planner-epic-unfold.prompt.md
+Command: ENRICH EPIC EP-00
+CONFIRM EPIC EP-00
+PROPOSE STORIES EP-00
+REVISE STORIES Split Android+iOS into separate stories
+CONFIRM STORIES
+WRITE STORY US-003
+CONFIRM STORY US-003
+PROPOSE TASKS US-003
+CONFIRM TASKS US-003
+```
 
 Acceptance Criteria rules (tasks): 3–7 bullets, objective, no trailing punctuation, no `and/or`.
 
@@ -79,6 +100,7 @@ Labels automatically (or implicitly) used:
 - `size:<XS|S|M>`
 - `story:US<N>-NN` (on tasks)
 - `epic:EP<N>-NN` (on tasks)
+
 Optional heuristic: `area:<token>` from GDD anchor segment.
 
 ProjectV2 attempted fields (ignored if absent): Status=Backlog, Iteration, Estimate, Type.
@@ -89,7 +111,8 @@ All tasks include `GDD Trace: GDDv1.1.md#<anchor>` where `<anchor>` follows GitH
 
 ## Outcome vs Activity
 
-Prefer: `Voice activity detector exposes stable Active flag`  
+Prefer: `Voice activity detector exposes stable Active flag`
+
 Avoid: `Implement voice detection` (activity-focused)
 
 ## Good vs Bad Task Examples
