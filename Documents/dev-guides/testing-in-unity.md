@@ -8,17 +8,17 @@ best practices aligned with our AI‑enhanced development principles.
 ## Edit‑mode vs. Play‑mode tests
 
 * **Edit‑mode tests** run inside the Unity Editor and have access to
-   editor code【504304711547036†L21-L31】. Use them to test pure logic and
+   editor code. Use them to test pure logic and
    editor extensions, such as VAD threshold calculations or JSON parsing.
 * **Play‑mode tests** run either in the Editor’s Play Mode or in a
-   standalone player【504304711547036†L44-L48】. They execute your game
+   standalone player. They execute your game
    code and can exercise coroutines, scenes and physics. Use them to
    simulate reading sessions, strict mode behaviour or reward animations.
 
 ### Choosing test attributes
 
 * Use NUnit’s `Test` attribute for synchronous tests. It works in both
-   edit and play modes and is simpler to write【504304711547036†L65-L71】.
+   edit and play modes and is simpler to write.
 * Use `UnityTest` for coroutine tests that need to yield, wait for a frame
    or a delay. This is common in play‑mode tests when simulating time.
 
@@ -26,8 +26,7 @@ best practices aligned with our AI‑enhanced development principles.
 
 Place your test scripts in a separate folder with an `.asmdef` file that
 references `nunit.framework` and, for play‑mode tests, your game
-assembly.  See the examples in the Unity Test Framework documentation
-【504304711547036†L51-L62】.
+assembly. See the examples in the Unity Test Framework documentation.
 
 ## First test recipe
 

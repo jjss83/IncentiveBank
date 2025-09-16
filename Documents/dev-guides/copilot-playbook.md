@@ -7,8 +7,8 @@ IncentiveBank.
 ## Understand Copilot’s strengths and weaknesses
 
 Copilot excels at repetitive code, writing tests, debugging syntax and
-explaining snippets【785259186302324†L340-L350】.  It is **not a
-replacement** for your expertise【785259186302324†L352-L356】.  Always
+explaining snippets. It is **not a
+replacement** for your expertise. Always
 validate generated code and ensure it aligns with the project’s goals and
 constraints.
 
@@ -16,8 +16,8 @@ constraints.
 
 Copilot works best when you give it the right context:
 
-* **Open relevant files** in your editor.  Copilot uses the current buffer
-  and nearby files as context【785259186302324†L426-L435】.
+* **Open relevant files** in your editor. Copilot uses the current buffer
+  and nearby files as context.
 * Include excerpts from the **GDD** or the **feature strategy template** at
   the top of a new file.  For example:
 
@@ -29,7 +29,7 @@ Copilot works best when you give it the right context:
   ```
 
 * When using Copilot Chat, specify the file or symbol names to focus the
-  assistant on the relevant code【785259186302324†L430-L437】.
+  assistant on the relevant code.
 
 ## Design before code
 
@@ -50,10 +50,6 @@ explore options:
 "Generate NUnit tests for the slice; do not write the implementation yet."
 ```
 
-Use these prompts in a **chat** environment or as comments in your file.
-
-## Todo-first workflow (required)
-
 Before generating or editing code, write a short, actionable todo list and keep it updated until the work is complete. This improves clarity and makes reviews easier.
 
 - Create todos that reflect the smallest meaningful steps (3–7 items).
@@ -72,11 +68,6 @@ TODOS
 
 See also: `ai-development-principles.md` and `unit-testing-best-practices.md`.
 
-## Write tests first
-
-Copilot can help you write tests quickly【785259186302324†L365-L368】.  Ask it to
-generate **NUnit** tests for your feature based on the acceptance criteria
-before you implement the code.  For example:
 
 ```
 // Tests for session timer

@@ -1,10 +1,8 @@
-AI-Enhanced Development Principles
-=================================
+# AI-Enhanced Development Principles
 
 Purpose: Establish clear, actionable principles for using AI agents and assistants effectively in this Unity project (and general software dev). These principles focus on clarity, maintainability, and testability. Each principle links to a detailed guide with patterns and examples.
 
-The Six Principles
-------------------
+## The Six Principles
 
 1) AI-specific comments in code
 - Intent: Make agent-oriented context and rationale explicit for future automation and teammates.
@@ -36,16 +34,14 @@ The Six Principles
 - What to do: Keep design intent, constraints, tricky edges, and links embedded in code comments and docstrings (XML docs). External design docs are inputs; the code carries the final narrative.
 - See: `ai-comments-guide.md`.
 
-How to use these principles
----------------------------
+## How to use these principles
 
 - Before you code: write a short todo list, note assumptions, and pick names that reflect intent.
 - While you code: embed AI-specific comments near key logic. Keep functions small; expose test seams.
 - After you code: run a consistency pass and ensure tests exist. Close all todos. Update inline docs if anything changed.
 - In reviews: use the checklist to verify adherence.
 
-Quick links
------------
+## Quick links
 
 - AI comments guide: `ai-comments-guide.md`
 - Naming convention: `ClassName.ai.md`
@@ -54,10 +50,9 @@ Quick links
 - Copilot playbook (AI workflow): `copilot-playbook.md`
 - Code review checklist: `code-review-checklist.md`
 
-References
-----------
+## References
 
 - Microsoft C# naming guidelines: https://learn.microsoft.com/dotnet/standard/design-guidelines/naming-guidelines
 - NUnit docs (Unity uses NUnit): https://docs.nunit.org/
 - Unity Test Framework: https://docs.unity3d.com/Packages/com.unity.test-framework@latest
-- Unity Manual: ScriptableObject: https://docs.unity3d.com/ScriptableObject.html
+- Unity Scripting API: ScriptableObject: https://docs.unity3d.com/ScriptReference/ScriptableObject.html

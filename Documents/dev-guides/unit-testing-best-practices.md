@@ -1,14 +1,11 @@
-Unit Testing Best Practices (General)
-=====================================
+# Unit Testing Best Practices (General)
 
-Goals
------
+## Goals
 - Confidence: Catch regressions fast.
 - Design: Encourage seams and small, pure units.
 - Speed: Run locally in seconds.
 
-Principles
-----------
+## Principles
 - Arrange-Act-Assert (AAA). Keep tests small and focused.
 - Determinism: No time, randomness, or network without control seams.
 - Isolation: Stub/mocks for collaborators; avoid global state.
@@ -16,10 +13,9 @@ Principles
 - One reason to fail: Avoid multiple asserts on unrelated concerns.
 - Name by behavior: `TypeName_Scenario_ExpectedResult`.
 
-C# with NUnit Examples
-----------------------
+## C# with NUnit Examples
 
-Simple pure function
+### Simple pure function
 
 ```csharp
 using NUnit.Framework;
@@ -43,7 +39,7 @@ public class RewardCalculatorTests
 }
 ```
 
-Builder pattern for readability
+### Builder pattern for readability
 
 ```csharp
 public class PlayerBuilder
@@ -70,21 +66,18 @@ public void Grant_AddsPoints_WhenUnderDailyCap()
 }
 ```
 
-Test Smells and Fixes
----------------------
+## Test Smells and Fixes
 - Slow tests: remove disk/network; substitute fakes.
 - Brittle tests: assert on outcomes, not internals.
 - Overuse of mocks: prefer fakes/stubs; mock only behavior contracts.
 - Hidden dependencies: make them constructor parameters.
 
-Tooling
--------
+## Tooling
 - NUnit (Unity compatible)
 - Fluent assertions optional
 - Coverage: measure lines/branches; target meaningful assertions, not just %
 
-Checklist
----------
+## Checklist
 - Test names describe behavior
 - No hidden time/randomness; use seams
 - One focused assertion (or grouped asserts for one concept)
