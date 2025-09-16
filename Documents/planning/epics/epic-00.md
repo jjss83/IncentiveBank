@@ -128,6 +128,40 @@ As a developer, I want Unity configured for Android, iOS, and Windows builds so 
 - Aligns with Unity Dev Basics for project configuration
 - Supports GDD risk mitigation strategy for Unity beta/LTS fallback
 
+#### Tasks
+
+- Design Unity Multi-Platform Architecture (Design, S)
+  - Define build target configurations for Android, iOS, Windows
+  - Specify architecture requirements (ARM64, x64)
+  - Document platform-specific player settings
+  - Create architecture decision records
+  - Validate against GDD platform requirements
+- Configure Android Build Settings (Config, S)
+  - Set target API level to 23+
+  - Configure ARM64 architecture
+  - Set appropriate texture compression
+  - Configure signing and security settings
+  - Validate build output structure
+- Configure iOS Build Settings (Config, S)
+  - Set minimum iOS version to 12+
+  - Configure ARM64 architecture
+  - Set appropriate texture compression for Metal
+  - Configure bundle identifier and signing
+  - Validate build output structure
+- Configure Windows Build Settings (Config, M)
+  - Set minimum Windows version to 10+
+  - Configure x64 architecture
+  - Set appropriate graphics API (DirectX/OpenGL)
+  - Configure executable and data folder structure
+  - Test on representative Windows hardware
+  - Validate WASAPI audio settings per GDD
+- [Edit-mode Test] Platform Build Configuration Tests (Test, S)
+  - Verify build settings are correctly applied per platform
+  - Test architecture configuration validation
+  - Validate platform-specific player settings
+  - Test build target switching functionality
+  - Ensure tests run in CI/CD pipeline
+
 ### US-002: [UI Development] Bootstrap Scene with Splash Display
 
 As a user, I want to see a splash screen when the app launches so that I know the app is loading properly on my device.
@@ -149,6 +183,38 @@ As a user, I want to see a splash screen when the app launches so that I know th
 - References GDD minimal app creation requirement
 - Follows Unity Dev Basics for scene structure and UI setup
 - Uses StreamingAssets for platform-agnostic splash image
+
+#### Tasks
+
+- Design Bootstrap Scene Layout (Design, S)
+  - Define scene hierarchy and component structure
+  - Plan splash image display timing and transitions
+  - Design scalable UI layout for multiple resolutions
+  - Document scene loading and initialization flow
+  - Validate against Unity Dev Basics patterns
+- Create Bootstrap Scene Asset (CreateAsset, S)
+  - Create new Unity scene file
+  - Set up Canvas with appropriate render mode
+  - Configure EventSystem for input handling
+  - Add placeholder UI elements
+  - Save scene in proper location
+- Implement Splash Display Logic (Code, S)
+  - Create MonoBehaviour for splash control
+  - Implement 2-second minimum display timer
+  - Add smooth transition animations
+  - Handle scene transition after splash
+  - Follow composition over inheritance principles
+- Configure TextMeshPro Integration (Config, XS)
+  - Import TextMeshPro package
+  - Configure default font assets
+  - Set up UI text components
+  - Validate text rendering on all platforms
+- [Play-mode Test] Bootstrap Scene Tests (Test, S)
+  - Test scene loads correctly on all platforms
+  - Verify splash display duration
+  - Test UI scaling across resolutions
+  - Validate smooth transitions
+  - Ensure tests run in CI/CD pipeline
 
 ### US-003: [Platform Setup] Mobile Permission Handling
 
@@ -172,6 +238,44 @@ As a mobile user, I want microphone permissions properly requested so that the a
 - Aligns with platform-specific best practices from risk mitigation
 - Critical for core VAD functionality in future epics
 
+#### Tasks
+
+- Design Permission Request Flow (Design, S)
+  - Define permission request timing and user experience
+  - Plan graceful handling of permission denial
+  - Design user feedback for permission states
+  - Document platform-specific permission behaviors
+  - Validate against platform best practices
+- Configure Android Manifest Permissions (Config, XS)
+  - Add RECORD_AUDIO permission to AndroidManifest.xml
+  - Configure permission request rationale
+  - Set appropriate permission protection level
+  - Validate manifest syntax
+- Configure iOS Info.plist Permissions (Config, XS)
+  - Add NSMicrophoneUsageDescription to Info.plist
+  - Write clear user-facing permission description
+  - Validate plist syntax and compliance
+  - Test permission prompt appearance
+- Implement Permission Request Logic (Code, M)
+  - Create permission manager component
+  - Implement runtime permission requests for Android
+  - Handle iOS permission status checking
+  - Add user feedback for permission denial
+  - Implement permission status persistence
+  - Follow composition over inheritance principles
+- [Edit-mode Test] Permission Handler Tests (Test, S)
+  - Test permission status checking logic
+  - Verify permission request flow
+  - Test error handling for permission failures
+  - Validate platform-specific behavior
+  - Ensure tests run in CI/CD pipeline
+- [Play-mode Test] Permission Integration Tests (Test, S)
+  - Test actual permission requests on device
+  - Verify user feedback displays correctly
+  - Test app behavior with denied permissions
+  - Validate permission persistence
+  - Test across multiple app launches
+
 ### US-004: [Audio Systems] Microphone Device Detection
 
 As a developer, I want to detect available microphone devices so that I can verify audio input capability across platforms.
@@ -193,6 +297,45 @@ As a developer, I want to detect available microphone devices so that I can veri
 - References GDD Audio/Perf requirements for Windows WASAPI settings
 - Supports GDD Acceptance Criteria #4 for Microphone.devices functionality
 - Foundation for future VAD implementation
+
+#### Tasks
+
+- Design Audio Device Detection System (Design, S)
+  - Define microphone device enumeration strategy
+  - Plan platform-specific device handling
+  - Design error handling for missing devices
+  - Document device selection criteria
+  - Validate against GDD audio requirements
+- Implement Microphone Device Enumeration (Code, M)
+  - Use Unity Microphone.devices API
+  - Create device information collection
+  - Implement device availability checking
+  - Add device selection logic
+  - Follow composition over inheritance principles
+- Add Platform-Specific Audio Handling (Code, M)
+  - Implement Windows WASAPI default settings
+  - Handle Android audio device variations
+  - Manage iOS audio session configuration
+  - Add platform-specific optimizations
+  - Validate audio input capabilities
+- Implement Device Detection Error Handling (Code, S)
+  - Handle empty device list gracefully
+  - Provide user feedback for audio issues
+  - Implement fallback device selection
+  - Add audio troubleshooting guidance
+  - Log device detection failures
+- [Edit-mode Test] Audio Device Detection Tests (Test, S)
+  - Test device enumeration logic
+  - Verify error handling paths
+  - Test platform-specific behavior
+  - Validate device selection criteria
+  - Ensure tests run in CI/CD pipeline
+- [Play-mode Test] Microphone Integration Tests (Test, M)
+  - Test actual microphone device detection
+  - Verify audio input capability
+  - Test platform-specific audio behavior
+  - Validate error handling on real devices
+  - Test across different hardware configurations
 
 ### US-005: [Script Dev] Platform Validation Logic
 
@@ -216,6 +359,45 @@ As a developer, I want platform-specific validation logic so that I can verify c
 - Supports GDD risk mitigation for audio API limitations
 - Enables graceful fallbacks per GDD audio guidelines
 
+#### Tasks
+
+- Design Platform Validator Architecture (Design, S)
+  - Define validation component structure
+  - Plan capability checking strategy
+  - Design validation result reporting
+  - Document component lifecycle
+  - Validate against Unity Dev Basics patterns
+- Implement PlatformValidator Component (Code, M)
+  - Create MonoBehaviour validator component
+  - Implement device capability checking
+  - Add platform-specific validation logic
+  - Integrate with microphone detection
+  - Follow composition over inheritance principles
+- Add Validation Result Logging (Code, S)
+  - Implement structured logging system
+  - Log validation results for debugging
+  - Add performance metrics collection
+  - Create validation result storage
+  - Format logs for easy analysis
+- Implement Graceful Failure Handling (Code, S)
+  - Handle validation failures gracefully
+  - Provide actionable user feedback
+  - Implement fallback behaviors
+  - Add validation retry mechanisms
+  - Log failure details for troubleshooting
+- [Edit-mode Test] Platform Validator Tests (Test, S)
+  - Test validation logic components
+  - Verify error handling paths
+  - Test logging functionality
+  - Validate component lifecycle
+  - Ensure tests run in CI/CD pipeline
+- [Play-mode Test] Validation Integration Tests (Test, S)
+  - Test validator component in runtime
+  - Verify validation results accuracy
+  - Test user feedback mechanisms
+  - Validate graceful failure handling
+  - Test across different device configurations
+
 ### US-006: [Asset Creation] Build Configuration Assets
 
 As a developer, I want ScriptableObject assets for build settings so that I can manage platform-specific configurations without code changes.
@@ -237,6 +419,40 @@ As a developer, I want ScriptableObject assets for build settings so that I can 
 - Follows Unity Dev Basics preference for ScriptableObjects for configuration
 - Supports maintainable platform-specific settings management
 - Enables flexible deployment configuration
+
+#### Tasks
+
+- Design BuildConfig ScriptableObject Schema (Design, S)
+  - Define configuration data structure
+  - Plan platform-specific settings organization
+  - Design configuration validation rules
+  - Document configuration usage patterns
+  - Validate against Unity Dev Basics patterns
+- Create BuildConfig ScriptableObject (CreateAsset, S)
+  - Implement ScriptableObject class definition
+  - Add serialized fields for build settings
+  - Implement configuration validation methods
+  - Add editor custom property drawer
+  - Create base configuration template
+- Create Platform-Specific Config Assets (CreateAsset, M)
+  - Create Android build configuration asset
+  - Create iOS build configuration asset
+  - Create Windows build configuration asset
+  - Configure platform-specific settings values
+  - Validate configuration completeness
+  - Set up asset organization structure
+- Implement Config Asset Loading (Code, S)
+  - Create configuration loader component
+  - Implement runtime config asset loading
+  - Add configuration validation at runtime
+  - Handle missing configuration gracefully
+  - Follow composition over inheritance principles
+- [Edit-mode Test] BuildConfig Asset Tests (Test, S)
+  - Test ScriptableObject creation and serialization
+  - Verify configuration validation logic
+  - Test asset loading mechanisms
+  - Validate platform-specific configurations
+  - Ensure tests run in CI/CD pipeline
 
 ### US-007: [Testing] Platform Compatibility Test Suite
 
@@ -260,6 +476,40 @@ As a developer, I want automated tests for platform compatibility so that I can 
 - Supports CI/CD integration for automated validation
 - Critical for maintaining platform compatibility over time
 
+#### Tasks
+
+- Design Test Suite Architecture (Design, S)
+  - Define test organization and structure
+  - Plan edit-mode vs play-mode test distribution
+  - Design test data management strategy
+  - Document testing patterns and conventions
+  - Validate against Testing in Unity guide
+- Create Edit-Mode Test Framework (Code, M)
+  - Set up Unity Test Framework for edit-mode
+  - Create base test classes and utilities
+  - Implement mock objects for platform testing
+  - Add test data generation helpers
+  - Configure test assembly definitions
+- Create Play-Mode Test Framework (Code, M)
+  - Set up Unity Test Framework for play-mode
+  - Create scene-based test infrastructure
+  - Implement device simulation utilities
+  - Add integration test helpers
+  - Configure test runner settings
+- Implement Platform-Specific Test Cases (Code, M)
+  - Create Android-specific test cases
+  - Create iOS-specific test cases
+  - Create Windows-specific test cases
+  - Add cross-platform compatibility tests
+  - Implement performance baseline tests
+  - Add audio device detection tests
+- Configure CI/CD Test Integration (Config, S)
+  - Set up test execution in build pipeline
+  - Configure test result reporting
+  - Add test failure notifications
+  - Set up test coverage reporting
+  - Configure test artifact storage
+
 ### US-008: [CI/CD] Automated Build Pipeline
 
 As a developer, I want automated builds for all platforms so that I can ensure consistent deployable artifacts without manual intervention.
@@ -281,3 +531,42 @@ As a developer, I want automated builds for all platforms so that I can ensure c
 - References epic CI/CD section for build automation requirements
 - Supports artifact management and version tagging
 - Foundation for reliable deployment process
+
+#### Tasks
+
+- Design CI/CD Pipeline Architecture (Design, M)
+  - Define build pipeline stages and dependencies
+  - Plan artifact management strategy
+  - Design version tagging and release process
+  - Document pipeline configuration requirements
+  - Validate against project deployment needs
+- Configure GitHub Actions Workflow (Config, M)
+  - Create workflow configuration files
+  - Set up Unity licensing for CI/CD
+  - Configure build matrix for multiple platforms
+  - Add test execution stages
+  - Set up artifact upload and storage
+- Implement Android Build Automation (Code, M)
+  - Configure Android build parameters
+  - Set up APK/AAB generation
+  - Add signing configuration
+  - Implement build validation checks
+  - Configure artifact naming and storage
+- Implement iOS Build Automation (Code, M)
+  - Configure iOS build parameters
+  - Set up IPA generation workflow
+  - Add certificate and provisioning handling
+  - Implement build validation checks
+  - Configure artifact naming and storage
+- Implement Windows Build Automation (Code, S)
+  - Configure Windows build parameters
+  - Set up executable generation
+  - Add build validation checks
+  - Configure artifact naming and storage
+  - Test build output structure
+- Configure Build Artifact Management (Config, S)
+  - Set up artifact storage and retention
+  - Configure version tagging strategy
+  - Add build metadata collection
+  - Set up artifact download mechanisms
+  - Configure cleanup and archival policies
