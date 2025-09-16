@@ -52,6 +52,26 @@ explore options:
 
 Use these prompts in a **chat** environment or as comments in your file.
 
+## Todo-first workflow (required)
+
+Before generating or editing code, write a short, actionable todo list and keep it updated until the work is complete. This improves clarity and makes reviews easier.
+
+- Create todos that reflect the smallest meaningful steps (3–7 items).
+- Mark exactly one todo as in-progress at any time; complete it before starting the next.
+- After implementation, revisit the list and mark all items done or document deferrals.
+
+Template (inline in code or PR description):
+
+```text
+TODOS
+- [ ] Add RewardCalculator.CapDaily tests (edge: limit <= 0)
+- [ ] Implement CapDaily without allocations; update XML docs
+- [ ] Add play-mode test for session timer coroutine
+- [ ] Update ai-comments near hot path
+```
+
+See also: `ai-development-principles.md` and `unit-testing-best-practices.md`.
+
 ## Write tests first
 
 Copilot can help you write tests quickly【785259186302324†L365-L368】.  Ask it to
@@ -89,6 +109,16 @@ Copilot can make mistakes.  Always validate its suggestions:
 * Use **automated tests** and tools such as linting and static analysis to
   catch issues【785259186302324†L409-L410】.
 
+## Consistency checks (required)
+
+Always evaluate whether your change aligns with surrounding code. If not, choose the closest consistent approach and document the rationale inline (see `ai-comments-guide.md`).
+
+Checklist:
+- Naming matches existing modules (`ClassName.ai.md`)
+- Patterns align (DI, ScriptableObjects, events, serialization)
+- Testing approach matches neighbors (edit vs play mode, builders)
+- Asset paths and folder organization follow Unity conventions
+
 ## Unity‑specific prompts
 
 Unity introduces lifecycle and physics nuances.  Here are some useful prompts:
@@ -104,6 +134,14 @@ Unity introduces lifecycle and physics nuances.  Here are some useful prompts:
 
 Use these as starting points.  Modify them to reflect your feature’s
 constraints and the smallest slice you are working on.
+
+## Links and references
+
+- AI principles: `ai-development-principles.md`
+- AI comments guide: `ai-comments-guide.md`
+- Naming conventions: `ClassName.ai.md`
+- Testing (general): `unit-testing-best-practices.md`
+- Testing (Unity): `testing-in-unity.md`
 
 ## Summary
 

@@ -35,8 +35,15 @@ implementation plan.
 8. **Cross‑platform considerations**.  Does the code handle Android,
    iOS and Windows appropriately (e.g. microphone selection, platform
    checks)?
-9. **Docs and comments**.  Are README or docs updated if behaviour
-   changed?  Link to design docs or user stories where relevant.
+9. **AI comments and inline docs**. Non‑obvious logic includes AI‑specific
+   comments (intent, constraints, edges, rationale). Public APIs have
+   XML docs. Inline docs are up‑to‑date with implementation.
+10. **Todo workflow**. PR description or inline section shows a small todo
+    list; all items are completed or explicitly deferred.
+11. **Consistency pass**. Naming, patterns, and folder/asset organization
+    align with surrounding code and `ClassName.ai.md`. Deviations are justified.
+12. **Docs and references**. Any external docs or strategy links are referenced
+    in code comments where relevant.
 
 ## Final checks
 
