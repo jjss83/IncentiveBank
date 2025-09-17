@@ -167,3 +167,27 @@ Running PREVIEW repeatedly is safe. Creation step skips items whose titles alrea
 
 ---
 Maintained: 2025-09-12. Update this README whenever prompt grammar or conventions change.
+
+---
+
+## Additional Unity Workflow Prompts
+
+These prompts support day-to-day Unity work beyond planning epics/stories:
+
+- `03-develop-script-feature.prompt.md`
+  - Classify a scripting ask (Minor | Major | Bug | New Feature), propose a plan, then implement code + tests in slices
+  - Usage: Attach file → `CLASSIFY "<ask>"` → `PROPOSE PLAN` → `APPROVE PLAN` → `IMPLEMENT` → `WRITE TESTS`
+
+- `04-unity-config-change.prompt.md`
+  - Plan and apply Unity configuration changes with small, reversible steps and verification
+  - Usage: Attach file → `LEARN "<ask>"` → `PLAN` → `APPROVE STEP 1` → `VERIFY` → `NEXT STEP`
+
+- `05-asset-creation.prompt.md` (NEW)
+  - Create either: 3D Asset Spec for artists or 2D Prompt Pack for image generation, with Unity import settings guidance
+  - Usage: Attach file → `LEARN "<asset need>"` → `SELECT TYPE 2D|3D` → `PLAN` → `APPROVE PLAN` → `EXECUTE` → `TEST`
+
+- `06-create-mechanich.prompt.md` (NEW)
+  - Define and build a game mechanic through phased planning that leverages 03 (code), 04 (config), and 05 (assets)
+  - Usage: Attach file → `LEARN "<mechanic>"` → `DEFINE` → `PLAN` → `APPROVE PHASE 1` → `EXECUTE SLICE` → `TEST` → `SUMMARIZE`
+
+Tip: You can chain prompts by attaching the relevant file when a phase calls for scripting, config, or asset work.
