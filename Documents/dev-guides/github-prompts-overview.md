@@ -18,6 +18,11 @@ document (GDD) and align them with the developer guides.
    them out, and generates tasks with estimates.  The prompt references
    the slice checklist and testing guide to ensure stories are small,
    vertical slices and each task includes acceptance criteria.
+3. **Develop Unity script features**. Attach `03-develop-script-feature.prompt.md`.
+  It classifies a scripting ask (Minor, Major, Bug, New Feature), proposes the
+  right template (note or design doc), and then guides implementation in
+  small, demoable slices with matching edit-mode/play-mode tests aligned to the
+  Unity basics, slice checklist and testing guide.
 
 ## Best practices
 
