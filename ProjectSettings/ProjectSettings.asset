@@ -489,7 +489,7 @@ PlayerSettings:
   - serializedVersion: 3
     m_BuildTarget: iPhone
     m_Formats: 30000000
-  playModeTestRunnerEnabled: 0
+  playModeTestRunnerEnabled: 1
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
   editorGfxJobOverride: 1
