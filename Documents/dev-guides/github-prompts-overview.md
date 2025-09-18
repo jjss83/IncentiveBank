@@ -23,6 +23,10 @@ document (GDD) and align them with the developer guides.
   right template (note or design doc), and then guides implementation in
   small, demoable slices with matching edit-mode/play-mode tests aligned to the
   Unity basics, slice checklist and testing guide.
+4. **Change Unity configuration**. Attach `04-unity-config-change.prompt.md`.
+  Use this when modifying Player/Project/Build/Input/Quality settings. It follows
+  a learn → plan → step-by-step approval flow, applies reversible changes, and
+  provides verification checklists or notes.
 
 ## Best practices
 
